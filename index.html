@@ -48,7 +48,7 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .fld input,.fld select,.fld textarea,.filters input,.filters select,.cell{border:1px solid var(--field);border-radius:5px;padding:8px 10px;background:#fff;width:100%;min-height:40px}
 .fld input[readonly]{background:#EEF3F7}
 .fld textarea{resize:vertical}
-.btn{border:1px solid var(--sea);background:var(--sea);color:#fff;border-radius:5px;padding:9px 16px;cursor:pointer;font-weight:600}
+.btn{border:1px solid var(--sea);background:var(--sea);color:#fff;border-radius:999px;padding:9px 20px;cursor:pointer;font-weight:600}
 .btn:hover{background:var(--sea2)}
 .btn.ghost{background:#fff;color:var(--sea)}
 .btn.ghost:hover{background:var(--tint)}
@@ -56,8 +56,11 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .btn.danger:hover{background:#FBEDEA}
 .btn.aqua{background:var(--aqua);border-color:var(--aqua);color:#04263A}
 .btn.aqua:hover{background:#4CBAD4}
-.btn.sm{padding:4px 10px;font-size:13px}
+.btn.sm{padding:4px 13px;font-size:13px}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
+.tbl .acts{flex-wrap:nowrap}
+.tbl td:last-child{white-space:nowrap}
+.tbl .acts .btn{white-space:nowrap}
 .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px}
 .tw{overflow-x:auto}
@@ -75,7 +78,6 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .fb img{max-width:130px;max-height:110px;display:block;margin-bottom:6px;border:1px solid var(--line);border-radius:4px}
 .fb input{font-size:13px;padding:4px!important;min-height:0!important}
 .sigbox{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
-canvas.sig{width:100%;max-width:340px;height:auto;aspect-ratio:3/1;border:1px dashed #7F9CB0;border-radius:5px;background:#fff;touch-action:none;cursor:crosshair}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:14px}
 .chk input{margin-top:5px;width:18px;height:18px}
 .pledge{background:var(--tint);border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-bottom:8px;white-space:pre-wrap;font-size:14px}
@@ -107,26 +109,28 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #busy.show{display:grid}
 #busy span{background:var(--deep);padding:12px 22px;border-radius:8px}
 /* documents */
-.doc{background:#fff;color:#000;font-size:13px;line-height:1.55;padding:6px}
-.lh{display:flex;gap:14px;align-items:center;justify-content:center;border-bottom:2px solid #0A3D62;padding-bottom:8px;margin-bottom:10px;text-align:center}
-.lh img{height:64px;width:64px;object-fit:cover;border-radius:50%}
+.doc{background:transparent;color:#000;font-size:13px;line-height:1.55;padding:6px;position:relative;z-index:0}
+.lh{position:relative;border-bottom:2px solid #0A3D62;padding-bottom:8px;margin-bottom:10px;text-align:center;min-height:72px}
+.lh img{position:absolute;left:0;top:0;height:66px;width:66px;object-fit:cover;border-radius:50%}
+.lh .lt{padding:0 78px}
 .lh h2{margin:0;font-size:22px;color:#0A3D62}
 .lh p{margin:0;font-size:12px}
 .dt{display:table;margin:8px auto;border:1.5px solid #0A3D62;border-radius:4px;padding:3px 26px;font-weight:700;font-size:16px;color:#0A3D62}
 .dmeta{display:flex;justify-content:space-between;margin-bottom:8px}
-.dtop{display:flex;gap:12px}
+.dtop{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
 .dtop>div:first-child{flex:1}
-.dphoto{width:110px;height:130px;border:1px solid #444;display:grid;place-items:center;color:#777;font-size:12px;overflow:hidden;flex:none}
+.dtop .kv{margin-bottom:0}
+.dphoto{width:84px;height:100px;border:1px solid #444;display:grid;place-items:center;color:#777;font-size:12px;overflow:hidden;flex:none}
 .dphoto img{width:100%;height:100%;object-fit:cover}
 .kv{width:100%;border-collapse:collapse;margin-bottom:8px}
 .kv td,.kv th{border:1px solid #6F8797;padding:4px 7px;vertical-align:top;text-align:left}
-.kv th{background:#E4EEF5;width:19%;font-weight:600}
+.kv th{background:rgba(228,238,245,.85);width:19%;font-weight:600}
 .kv td.n,.kv th.n{text-align:right;width:auto}
 .dh3{font-weight:700;margin:10px 0 4px;color:#0A3D62}
 .sigrow{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
 .sgb{text-align:center;min-width:120px;flex:1}
-.sigimg{height:44px;max-width:150px;display:block;margin:0 auto;object-fit:contain}
-.sgl{border-top:1px solid #000;margin-top:2px;padding-top:2px;font-size:12px}
+.sigimg{height:44px;max-width:150px;display:block;margin:0 auto;object-fit:contain;mix-blend-mode:multiply}
+.sgl{border-top:1px solid #000;margin:2px auto 0;padding-top:2px;font-size:12px;width:96px}
 .pb{page-break-before:always;break-before:page}
 .atts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .atts div{border:1px solid #6F8797;padding:6px;text-align:center;font-size:12px}
@@ -134,32 +138,52 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .rc{max-width:600px;margin:0 auto;border:1px solid #4E6A7C;padding:14px}
 .rc .kv{font-size:11.5px}
 .rc .kv th{width:auto}
-/* ID cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,max-content));gap:14px;justify-content:center}
-.idc{width:85.6mm;height:54mm;border:.3mm solid #0A3D62;border-radius:3mm;overflow:hidden;background:#fff;color:#000;display:flex;flex-direction:column;font-size:8.5pt;line-height:1.35;break-inside:avoid}
-.idc .ih{background:#0A3D62;color:#fff;display:flex;gap:2mm;align-items:center;padding:1.4mm 2.5mm;height:11mm}
-.idc .ih img{height:8mm;width:8mm;border-radius:50%;background:#fff;object-fit:cover}
-.idc .ih b{font-size:10.5pt;line-height:1.15}
-.idc .ib{display:flex;gap:3mm;padding:2mm 2.5mm;flex:1}
-.idc .ph{width:22mm;height:28mm;border:.3mm solid #8AA;flex:none;overflow:hidden;display:grid;place-items:center;font-size:7pt;color:#888}
+.wmk{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:-1;pointer-events:none}
+.wmk img{width:62%;max-width:120mm;opacity:.08;filter:grayscale(1)}
+.pfoot{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:9.5px;color:#234;border-top:1px solid #0A3D62;padding-top:2px;background:#fff}
+.credit{position:fixed;right:-8mm;top:50%;writing-mode:vertical-rl;font-size:7px;color:#666;white-space:nowrap}
+/* ID cards (portrait) */
+.cards{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.pair{display:flex;gap:4mm;break-inside:avoid}
+.idc{width:54mm;height:85.6mm;border:.3mm solid #0A3D62;border-radius:3mm;overflow:hidden;background:#fff;color:#000;display:flex;flex-direction:column;font-size:7.5pt;line-height:1.35;position:relative;z-index:0;break-inside:avoid}
+.idc .wm{position:absolute;left:50%;top:50%;width:34mm;transform:translate(-50%,-50%);opacity:.09;z-index:-1;filter:grayscale(1)}
+.idc .ih{background:#0A3D62;color:#fff;position:relative;height:14mm;display:flex;align-items:center;justify-content:center;padding:0 2mm 0 13mm;text-align:center}
+.idc .ih img{position:absolute;left:2mm;top:50%;transform:translateY(-50%);height:9.5mm;width:9.5mm;border-radius:50%;background:#fff;object-fit:cover}
+.idc .ih b{font-size:8.6pt;line-height:1.2}
+.idc .ib{display:flex;flex-direction:column;align-items:center;padding:2.5mm 3mm 0;flex:1;gap:.8mm}
+.idc .ph{width:23mm;height:28mm;border:.35mm solid #0A3D62;overflow:hidden;display:grid;place-items:center;font-size:7pt;color:#888}
 .idc .ph img{width:100%;height:100%;object-fit:cover}
-.idc .nm{font-weight:700;font-size:11pt;color:#0A3D62}
-.idc .if{display:flex;justify-content:space-between;align-items:flex-end;padding:0 2.5mm 1.5mm;font-size:7pt;height:9mm}
-.idc .if img{height:6.5mm}
-.idc .bd{padding:2.5mm;flex:1;font-size:8pt}
-.idc .gold{height:1.2mm;background:#1FA3C4;flex:none}
+.idc .nm{font-weight:700;font-size:10pt;color:#0A3D62;text-align:center;line-height:1.2;margin-top:1mm}
+.idc .rows{align-self:stretch;text-align:center;font-size:7.5pt}
+.idc .sb{text-align:center;padding:0 3mm 1mm}
+.idc .sb img{height:7mm;display:block;margin:0 auto;mix-blend-mode:multiply}
+.idc .sb span{display:block;border-top:.25mm solid #000;width:18mm;margin:0 auto;font-size:6.5pt}
+.idc .if{background:#1FA3C4;color:#03283B;text-align:center;font-size:7pt;font-weight:600;padding:1.2mm 2mm;min-height:6.5mm}
+.idc .bd{padding:3mm;flex:1;font-size:7.3pt}
+.idc .bd div{margin-bottom:1.2mm}
+.idc .cr{font-size:5.5pt;font-weight:400}
+#foot{background:var(--deep);color:#CFE3F1;text-align:center;font-size:13px;padding:16px 14px 12px;margin-top:8px;line-height:1.7}
+#foot:empty{display:none}
+#foot b{color:#fff;font-size:15px}
+#foot a{color:#8FD6E8}
+#foot .cr{font-size:11px;opacity:.7;margin-top:4px}
+.erow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.erow .c{flex:2;min-width:0}.erow .m{flex:1;min-width:0}
 @media(max-width:720px){.two{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.kpi.hero{grid-column:span 1}main{padding:12px}}
 @media screen{.cards{zoom:.9}}
 #printArea{display:none}
 #stage{display:block;position:fixed;left:-10000px;top:0;width:640px;background:#fff}
+#stage .wmk{position:absolute}
+#stage .pfoot{position:static;margin-top:10px}
 @media print{
  body{background:#fff}
  #app,#toast,#dlg,#busy{display:none!important}
- #printArea{display:block}
+ #printArea{display:block;position:relative;z-index:0;padding-bottom:12mm}
  #stage{display:none}
- @page{size:A4;margin:10mm}
- .cards{zoom:1;grid-template-columns:repeat(2,85.6mm);gap:4mm}
- .idc,.kv th,.lh,.dphoto,.idc .ih,.idc .gold{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ @page{size:A4;margin:10mm 12mm}
+ .cards{zoom:1;gap:4mm}
+ .pair{margin:0 auto 4mm}
+ .idc,.kv th,.lh,.dphoto,.idc .ih,.idc .if,.wmk img{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -176,6 +200,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
   <div class="scrim" id="scrim" onclick="toggleMenu()"></div>
   <nav class="drawer" id="drawer"></nav>
   <main id="main"></main>
+  <footer id="foot"></footer>
 </div>
 <div id="printArea"></div>
 <div id="stage"></div>
@@ -221,13 +246,13 @@ let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
 const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created']);
 const BOOLF=new Set(['pledge','approved']);
-const JSONF=new Set(['lines','history','seq']);
+const JSONF=new Set(['lines','history','seq','items']);
 function norm(rec){for(const k in rec){const x=rec[k];
   if(JSONF.has(k)){try{rec[k]=x?(typeof x==='string'?JSON.parse(x):x):(k==='seq'?{}:[])}catch(e){rec[k]=k==='seq'?{}:[]}}
   else if(NUMF.has(k))rec[k]=+x||0;
   else if(BOOLF.has(k))rec[k]=(x===true||x==='true'||x==='TRUE')}
   return rec}
-const wire=o=>{const w=Object.assign({},o);delete w._full;return w};
+const wireK=(o,ex,fields)=>{const w=Object.assign({},o);delete w._full;(fields||[]).forEach(f=>{w[f]=keep(ex,f,o[f])});return w};
 const keep=(ex,k,val)=>ex&&ex[k]&&ex[k]===val?'@':val;
 async function api(action,payload){
   const r=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({key:PW,action},payload||{}))});
@@ -237,7 +262,7 @@ const batch=ops=>api('batch',{ops});
 const seqOp=patch=>({op:'upsert',table:'settings',rec:{id:'main',seq:Object.assign({},DB.seq,patch)}});
 async function work(fn){busy(true);try{await fn();setStat('Google শীটে সংরক্ষিত');return true}catch(e){handleErr(e);return false}finally{busy(false)}}
 function handleErr(e){if(String(e.message)==='AUTH'){logout('পাসওয়ার্ড ভুল বা বদলে গেছে');return}toast('সংযোগ ব্যর্থ: '+(e.message||e));setStat('সংযোগ নেই')}
-function logout(msg){PW='';try{localStorage.removeItem('madrasa_pw')}catch(e){}LOADED=false;$('#main').innerHTML=pLogin(msg||'')}
+function logout(msg){$('#foot').innerHTML='';PW='';try{localStorage.removeItem('madrasa_pw')}catch(e){}LOADED=false;$('#main').innerHTML=pLogin(msg||'')}
 async function hydrate(table,rec){
   if(!rec||rec._full)return rec;
   const HEAVY=['sigStu','sigGua','sigHead','sigDir','birthCert','fNid','mNid','sig','dirSig','sigCash','sigRec'];
@@ -277,17 +302,9 @@ function readImg(file,max,q,limit){return new Promise((res,rej)=>{const fr=new F
 const FV={};
 function fileBox(id,label,val,max,limit){FV[id]=val||'';return `<div class="fld"><span>${label}</span><div class="fb"><img id="${id}_p" src="${val||''}" ${val?'':'style="display:none"'} alt=""><input type="file" accept="image/*" onchange="pickFile(this,'${id}',${max||800},${limit||250000})"></div></div>`}
 async function pickFile(inp,id,max,limit){const f=inp.files[0];if(!f)return;try{FV[id]=await readImg(f,max,.7,limit);const p=$('#'+id+'_p');p.src=FV[id];p.style.display='block'}catch(e){toast('ছবি লোড করা যায়নি')}}
-const SIGV={};
-function sigBox(id,label,val){SIGV[id]=val||'';return `<div class="sigbox"><span>${label}</span><canvas class="sig" id="${id}" width="300" height="100"></canvas><button type="button" class="btn sm ghost" onclick="clearSig('${id}')">মুছুন</button></div>`}
-const dirNote='<p class="note">পরিচালকের স্বাক্ষর খালি রাখলে “প্রতিষ্ঠান সেটাপ”-এর স্বাক্ষর ব্যবহার হবে।</p>';
-function initSigs(){document.querySelectorAll('canvas.sig').forEach(c=>{const x=c.getContext('2d');x.lineWidth=2.4;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#0a1f5c';c.dataset.has='0';
-  if(SIGV[c.id]&&SIGV[c.id]!=='@'){const im=new Image();im.onload=()=>{x.drawImage(im,0,0,c.width,c.height);c.dataset.has='1'};im.src=SIGV[c.id]}
-  let d=false,l=[0,0];const pos=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
-  c.onpointerdown=e=>{d=true;l=pos(e);c.setPointerCapture(e.pointerId);e.preventDefault()};
-  c.onpointermove=e=>{if(!d)return;const p=pos(e);x.beginPath();x.moveTo(l[0],l[1]);x.lineTo(p[0],p[1]);x.stroke();l=p;c.dataset.has='1'};
-  c.onpointerup=c.onpointercancel=()=>{d=false}})}
-function clearSig(id){const c=$('#'+id);c.getContext('2d').clearRect(0,0,c.width,c.height);c.dataset.has='0'}
-const getSig=id=>{const c=$('#'+id);return c&&c.dataset.has==='1'?c.toDataURL('image/png'):''};
+function sigBox(id,label,val){FV[id]=val&&val!=='@'?val:'';return `<div class="fld"><span>${label} (আপলোড)</span><div class="fb"><img id="${id}_p" src="${FV[id]}" ${FV[id]?'':'style="display:none"'} alt=""><input type="file" accept="image/*" onchange="pickFile(this,'${id}',400,120000)"><button type="button" class="btn sm ghost" style="margin-top:6px" onclick="clearFile('${id}')">মুছুন</button></div></div>`}
+function clearFile(id){FV[id]='';const p=$('#'+id+'_p');if(p){p.removeAttribute('src');p.style.display='none';const i=p.parentNode.querySelector('input[type=file]');if(i)i.value=''}}
+const getSig=id=>FV[id]||'';
 
 /* ================= form helpers ================= */
 const fld=(id,label,val,type,extra)=>`<label class="fld"><span>${label}</span><input id="${id}" type="${type||'text'}" value="${esc(val)}" ${extra||''}></label>`;
@@ -295,11 +312,22 @@ const sel=(id,label,opts,val,extra)=>`<label class="fld"><span>${label}</span><s
 const area=(id,label,val,cls,rows)=>`<label class="fld ${cls||''}"><span>${label}</span><textarea id="${id}" rows="${rows||2}">${esc(val)}</textarea></label>`;
 
 /* ================= printing ================= */
-function printHTML(h){$('#printArea').innerHTML=h;setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
+const CREDIT='@AM Shahed: 01605721296';
+const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
+function footLine(){const s=DB.settings;return [s.address&&esc(s.address),s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp),s.facebook&&'Facebook: '+esc(s.facebook),s.youtube&&'YouTube: '+esc(s.youtube)].filter(Boolean).join(' &nbsp;|&nbsp; ')}
+function printHTML(h,o){o=o||{};
+  $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h+(o.nofoot?'':`<div class="pfoot">${footLine()}</div>`)+(o.nocredit?'':`<div class="credit">${CREDIT}</div>`);
+  setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
-function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${s.founded?`<p>প্রতিষ্ঠাকাল: ${bn(s.founded)}</p>`:''}<p>${esc(s.address)}</p><p>${c}</p></div></div>`}
+function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${s.founded?`<p>প্রতিষ্ঠাকাল: ${bn(s.founded)}</p>`:''}<p>${esc(s.address)}</p><p>${c}</p></div></div>`}
 const sg=(src,label)=>`<div class="sgb">${src&&src!=='@'?`<img class="sigimg" src="${src}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">${label}</div></div>`;
 const kvRows=p=>{let h='';for(let i=0;i<p.length;i+=2){const a=p[i],b=p[i+1];h+=`<tr><th>${a[0]}</th><td>${a[1]||'&nbsp;'}</td>${b?`<th>${b[0]}</th><td>${b[1]||'&nbsp;'}</td>`:'<td colspan="2"></td>'}</tr>`}return h};
+function siteFooter(){const s=DB.settings;
+  const lk=(u,tx)=>u?(/^https?:\/\//i.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${tx}</a>`:`${tx}: ${esc(u)}`):'';
+  let wn=en(s.whatsapp||'').replace(/\D/g,'');if(wn.startsWith('0'))wn='88'+wn;
+  const wa=wn?`<a href="https://wa.me/${wn}" target="_blank" rel="noopener">WhatsApp: ${bn(s.whatsapp)}</a>`:'';
+  const parts=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),wa,lk(s.facebook,'Facebook'),lk(s.youtube,'YouTube')].filter(Boolean);
+  return `<b>${esc(s.name||'')}</b>${s.address?`<div>${esc(s.address)}</div>`:''}${parts.length?`<div>${parts.join(' &nbsp;·&nbsp; ')}</div>`:''}<div class="cr">${CREDIT}</div>`}
 
 /* ================= fee logic ================= */
 function feeAmount(r,month){let a=0;r.history.slice().sort((x,y)=>x.from<y.from?-1:1).forEach(h=>{if(h.from<=month)a=h.amount});return a}
@@ -326,7 +354,7 @@ function repData(from,to){
   const S=(a,f)=>a.reduce((t,x)=>t+(+f(x)||0),0);
   const byHead={},byCat={};
   cols.forEach(c=>c.lines.forEach(l=>{if(l.paid)byHead[l.head]=(byHead[l.head]||0)+l.paid}));
-  ex.forEach(e=>{const k=e.cat||'অন্যান্য';byCat[k]=(byCat[k]||0)+e.amount});
+  ex.forEach(e=>{(e.items&&e.items.length?e.items:[{cat:e.cat,amount:e.amount}]).forEach(i=>{const k=i.cat||'অন্যান্য';byCat[k]=(byCat[k]||0)+i.amount})});
   return{byHead,byCat,inc:S(cols,c=>c.totalPaid),exp:S(ex,e=>e.amount),sal:S(sl,x=>x.paid),adm:DB.students.filter(s=>inR(s.admDate)).length};
 }
 
@@ -346,15 +374,15 @@ function drawMenu(){
   const s=DB.settings;
   $('#drawer').innerHTML=`<div class="dh">${esc(s.name||'হিফয মাদরাসা')}<small>ব্যবস্থাপনা সফটওয়্যার</small></div>`+MENU.map(m=>{
     if(!m.sub)return `<button class="mi ${R.page===m.k?'act':''}" onclick="go('${m.k}')">${m.t}</button>`;
-    const has=m.sub.some(x=>x[0]===R.page),op=OPEN[m.t]||has;
-    return `<div class="grp ${op?'open':''}"><button class="mi" onclick="OPEN['${m.t}']=!(OPEN['${m.t}']||${has});drawMenu()">${m.t}<span class="ch">›</span></button><div class="sub">${m.sub.map(x=>`<button class="mi ${R.page===x[0]?'act':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</div></div>`}).join('');
+    return `<div class="grp ${OPEN[m.t]?'open':''}"><button class="mi" onclick="OPEN['${m.t}']=!OPEN['${m.t}'];drawMenu()">${m.t}<span class="ch">›</span></button><div class="sub">${m.sub.map(x=>`<button class="mi ${R.page===x[0]?'act':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</div></div>`}).join('')+`<button class="mi" style="font-weight:400;color:var(--mute)" onclick="toggleMenu(false);logout('')">লগআউট</button>`;
 }
 function toggleMenu(force){const d=$('#drawer'),o=typeof force==='boolean'?force:!d.classList.contains('open');d.classList.toggle('open',o);$('#scrim').classList.toggle('open',o);$('#burger').setAttribute('aria-expanded',o)}
 const TBL={stu:'students',fee:'collections',stf:'staff',sal:'salaries'};
 async function go(page,view,id){
   toggleMenu(false);if(!LOADED)return;
   if(view==='form'&&id&&TBL[page]){try{await hydrate(TBL[page],DB[TBL[page]].find(x=>x.id===id))}catch(e){return handleErr(e)}}
-  R={page,view:view||'list',id:id||null};RT=null;render();window.scrollTo(0,0);
+  MENU.forEach(m=>{if(m.sub&&m.sub.some(x=>x[0]===page))OPEN[m.t]=true});
+  R={page,view:view||'list',id:id||null};RT=null;EXID=null;ET=null;render();window.scrollTo(0,0);
 }
 function render(){
   if(!LOADED)return;
@@ -363,7 +391,7 @@ function render(){
   const f=R.view==='form';
   const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup};
   $('#main').innerHTML=map[R.page]();
-  initSigs();if(AFTER)AFTER();drawMenu();
+  if(AFTER)AFTER();drawMenu();$('#foot').innerHTML=siteFooter();
 }
 
 /* ================= dashboard ================= */
@@ -442,7 +470,7 @@ function stuForm(){
   <div class="sec">প্রতিষ্ঠানের অনুমোদন</div>
   <div class="pledge">${esc(st.approval)}</div>
   <label class="chk"><input type="checkbox" id="f_ap" ${s.approved?'checked':''}> ভর্তি অনুমোদিত</label>
-  <div class="grid" style="margin-top:10px">${sigBox('g_head','প্রধান শিক্ষকের স্বাক্ষর',s.sigHead)}${sigBox('g_dir','পরিচালকের স্বাক্ষর',s.sigDir)}</div>${dirNote}
+  <div class="grid" style="margin-top:10px">${sigBox('g_head','প্রধান শিক্ষকের স্বাক্ষর',s.sigHead)}</div>
   <div class="row"><button class="btn" onclick="saveStu()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('stu')">বাতিল</button>${nw?'':`<button class="btn ghost" onclick="printStu('${s.id}')">প্রিন্ট</button>`}</div>
   </div>`;
 }
@@ -456,11 +484,11 @@ async function saveStu(){
   const o={id:ex?ex.id:uid(),formNo:fn,sid:ex?ex.sid:mkSid(v('f_adm'),fn),admDate:v('f_adm'),dept:v('f_dept'),type:v('f_type'),name:v('f_name'),dob:v('f_dob'),blood:v('f_blood'),
    fName:v('f_fName'),fJob:v('f_fJob'),fMobile:en(v('f_fMobile')),mName:v('f_mName'),mJob:v('f_mJob'),mMobile:en(v('f_mMobile')),
    gName:v('f_gName'),gRel:v('f_gRel'),gMobile:en(v('f_gMobile')),permAddr:v('f_perm'),presAddr:v('f_pres'),pledge:ck('f_pl'),approved:ck('f_ap'),
-   photo:FV.a_photo,birthCert:keep(ex,'birthCert',FV.a_birth),fNid:keep(ex,'fNid',FV.a_fnid),mNid:keep(ex,'mNid',FV.a_mnid),
-   sigStu:getSig('g_stu'),sigGua:getSig('g_gua'),sigHead:getSig('g_head'),sigDir:getSig('g_dir'),created:ex?ex.created:Date.now()};
-  const ops=[{op:'upsert',table:'students',rec:o}];if(!ex)ops.push(seqOp({form:fn}));
+   photo:FV.a_photo,birthCert:FV.a_birth,fNid:FV.a_fnid,mNid:FV.a_mnid,
+   sigStu:getSig('g_stu'),sigGua:getSig('g_gua'),sigHead:getSig('g_head'),created:ex?ex.created:Date.now()};
+  const ops=[{op:'upsert',table:'students',rec:wireK(o,ex,['sigStu','sigGua','sigHead','birthCert','fNid','mNid'])}];if(!ex)ops.push(seqOp({form:fn}));
   if(!await work(()=>batch(ops)))return;
-  Object.assign(o,{birthCert:FV.a_birth,fNid:FV.a_fnid,mNid:FV.a_mnid,_full:true});
+  o._full=true;
   if(ex)DB.students[DB.students.indexOf(ex)]=o;else{DB.students.push(o);DB.seq.form=fn}
   toast('ভর্তি ফরম সংরক্ষিত');go('stu');
 }
@@ -481,7 +509,7 @@ function admissionDoc(s){
   <div class="dh3">অঙ্গীকারনামা</div><div>${esc(st.pledge)} ${s.pledge?'<b>(সম্মত)</b>':''}</div>
   <div class="sigrow">${sg(s.sigStu,'শিক্ষার্থীর স্বাক্ষর')}${sg(s.sigGua,'অভিভাবকের স্বাক্ষর')}</div>
   <div class="dh3" style="margin-top:16px">প্রতিষ্ঠানের অনুমোদন</div><div>${esc(st.approval)} <b>${s.approved?'(অনুমোদিত)':'(অপেক্ষমাণ)'}</b></div>
-  <div class="sigrow">${sg(s.sigHead,'প্রধান শিক্ষক')}${sg(s.sigDir||st.directorSig,'পরিচালক')}</div>
+  <div class="sigrow">${sg(s.sigHead,'প্রধান শিক্ষক')}${sg(st.directorSig,'পরিচালক')}</div>
   ${atts.length?`<div class="pb"></div><div class="dt">সংযুক্তি — ${esc(s.name)}</div><div class="atts">${atts.map(a=>`<div>${a[0]}<br><img src="${a[1]}" alt=""></div>`).join('')}</div>`:''}</div>`;
 }
 
@@ -518,7 +546,7 @@ function feeForm(){
   </div>
   <div class="sec" style="margin-top:18px">ভর্তি থেকে নির্বাচিত মাস পর্যন্ত খাত ভিত্তিক বকেয়া</div><div id="lines"></div>
   ${area('c_note','মন্তব্য',c.note,'')}
-  <div class="sec">স্বাক্ষর</div><div class="grid">${sigBox('c_sc','ক্যাশিয়ারের স্বাক্ষর',c.sigCash)}${sigBox('c_sd','পরিচালকের স্বাক্ষর',c.sigDir)}</div>${dirNote}
+  <div class="sec">স্বাক্ষর</div><div class="grid">${sigBox('c_sc','ক্যাশিয়ারের স্বাক্ষর',c.sigCash)}</div>
   <div class="row"><button class="btn" onclick="saveFee()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('fee')">বাতিল</button></div></div>`;
 }
 function calcLines(){
@@ -546,8 +574,8 @@ async function saveFee(){
   const tp=lines.reduce((t,l)=>t+l.paid,0),td=lines.reduce((t,l)=>t+l.due,0);
   if(!lines.length||tp<=0)return toast('অন্তত একটি খাতে পরিশোধের পরিমাণ দিন');
   const ex=DB.collections.find(x=>x.id===R.id),rn=ex?ex.receiptNo:DB.seq.receipt+1;
-  const o={id:ex?ex.id:uid(),receiptNo:rn,date:v('c_date'),month:m,studentId:sid,lines,totalDue:td,totalPaid:tp,remaining:td-tp,note:v('c_note'),sigCash:getSig('c_sc'),sigDir:getSig('c_sd')};
-  const ops=[{op:'upsert',table:'collections',rec:o}];if(!ex)ops.push(seqOp({receipt:rn}));
+  const o={id:ex?ex.id:uid(),receiptNo:rn,date:v('c_date'),month:m,studentId:sid,lines,totalDue:td,totalPaid:tp,remaining:td-tp,note:v('c_note'),sigCash:getSig('c_sc')};
+  const ops=[{op:'upsert',table:'collections',rec:wireK(o,ex,['sigCash'])}];if(!ex)ops.push(seqOp({receipt:rn}));
   if(!await work(()=>batch(ops)))return;
   o._full=true;if(ex)DB.collections[DB.collections.indexOf(ex)]=o;else{DB.collections.push(o);DB.seq.receipt=rn}
   toast('রশিদ সংরক্ষিত');go('fee');
@@ -560,12 +588,12 @@ function receiptDoc(c){
   <table class="kv">${kvRows([['নাম',esc(s.name)],['আইডি',bn(s.sid)],['বিভাগ',s.dept],['ধরণ',s.type],['ভর্তি',fmonth((s.admDate||'').slice(0,7))],['হিসাব পর্যন্ত',fmonth(c.month)]])}</table>
   <table class="kv"><tr><th>খাত</th><th class="n">মোট প্রাপ্য</th><th class="n">পূর্বে পরিশোধ</th><th class="n">বকেয়া</th><th class="n">পরিশোধ</th><th class="n">অবশিষ্ট</th></tr>${c.lines.map(l=>`<tr><td>${esc(l.head)}</td><td class="n">${l.total!=null?tk(l.total):''}</td><td class="n">${l.prev!=null?tk(l.prev):''}</td><td class="n">${tk(l.due)}</td><td class="n">${tk(l.paid)}</td><td class="n">${tk(l.due-l.paid)}</td></tr>`).join('')}<tr><th>মোট</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.total||0),0))}</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.prev||0),0))}</th><th class="n">${tk(c.totalDue)}</th><th class="n">${tk(c.totalPaid)}</th><th class="n">${tk(c.remaining)}</th></tr></table>
   ${c.note?`<div>মন্তব্য: ${esc(c.note)}</div>`:''}
-  <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(c.sigDir||DB.settings.directorSig,'পরিচালক')}</div></div>`;
+  <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
 }
 async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printHTML(receiptDoc(c))}catch(e){handleErr(e)}}
 async function shareRc(id){
   let c;try{c=await hydrate('collections',DB.collections.find(x=>x.id===id))}catch(e){return handleErr(e)}
-  const st=$('#stage');st.innerHTML=receiptDoc(c);
+  const st=$('#stage');st.innerHTML=receiptDoc(c);st.firstElementChild.insertAdjacentHTML('afterbegin',wmHTML());st.firstElementChild.insertAdjacentHTML('beforeend',`<div class="pfoot">${footLine()}</div>`);
   if(!window.html2canvas){st.innerHTML='';return toast('ইমেজ তৈরির জন্য ইন্টারনেট প্রয়োজন')}
   try{const cv=await html2canvas(st.firstElementChild,{scale:2,backgroundColor:'#fff'});
     cv.toBlob(async b=>{const f=new File([b],'receipt-'+c.receiptNo+'.png',{type:'image/png'});
@@ -585,14 +613,17 @@ function pIdc(){
 }
 function idList(){const all=document.querySelector('input[name=idm]:checked').value==='all';if(all){const d=v('iddept');return DB.students.filter(s=>!d||s.dept===d)}const s=DB.students.find(x=>x.id===v('idst'));return s?[s]:[]}
 function idcFill(){const all=document.querySelector('input[name=idm]:checked').value==='all';$('#idone').style.display=all?'none':'';$('#idall').style.display=all?'':'none';const l=idList();$('#idprev').innerHTML=l.map(idCard).join('')||'<p class="empty" style="grid-column:1/-1">শিক্ষার্থী নির্বাচন করুন</p>'}
-function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`)}
+function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`,{nowm:true,nofoot:true,nocredit:true})}
 function idCard(s){
-  const st=DB.settings;
-  return `<div class="idc"><div class="ih">${st.logo?`<img src="${st.logo}" alt="">`:''}<b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b></div>
-  <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div><div class="nm">${esc(s.name)}</div><div>আইডি: <b>${bn(s.sid)}</b></div><div>বিভাগ: ${s.dept} (${s.type})</div>${s.blood?`<div>রক্তের গ্রুপ: ${esc(s.blood)}</div>`:''}<div>অভিভাবক: ${bn(s.gMobile||s.fMobile||'')}</div></div></div>
-  <div class="if"><span>ভর্তি: ${fdate(s.admDate)}</span><span style="text-align:center">${st.directorSig?`<img src="${st.directorSig}" alt=""><br>`:''}পরিচালক</span></div></div>
-  <div class="idc"><div class="ih">${st.logo?`<img src="${st.logo}" alt="">`:''}<b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b></div><div class="gold"></div>
-  <div class="bd"><div>ঠিকানা: ${esc(st.address)}</div>${st.directorMobile?`<div>যোগাযোগ: ${bn(st.directorMobile)}</div>`:''}${st.whatsapp?`<div>WhatsApp: ${bn(st.whatsapp)}</div>`:''}${st.facebook?`<div>Facebook: ${esc(st.facebook)}</div>`:''}<div style="margin-top:2mm;font-size:7pt">এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div></div></div>`;
+  const st=DB.settings,wm=st.logo?`<img class="wm" src="${st.logo}" alt="">`:'',lg=st.logo?`<img src="${st.logo}" alt="">`:'';
+  const head=`<div class="ih">${lg}<b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b></div>`;
+  return `<div class="pair"><div class="idc">${wm}${head}
+  <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(s.name)}</div>
+  <div class="rows"><div>আইডি: <b>${bn(s.sid)}</b></div><div>বিভাগ: ${s.dept} (${s.type})</div>${s.blood?`<div>রক্তের গ্রুপ: ${esc(s.blood)}</div>`:''}<div>অভিভাবক: ${bn(s.gMobile||s.fMobile||'')}</div></div></div>
+  <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
+  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):esc(st.name)}</div></div>
+  <div class="idc">${wm}${head}<div class="bd"><div>ঠিকানা: ${esc(st.address)}</div>${st.directorMobile?`<div>যোগাযোগ: ${bn(st.directorMobile)}</div>`:''}${st.whatsapp?`<div>WhatsApp: ${bn(st.whatsapp)}</div>`:''}${st.facebook?`<div>Facebook: ${esc(st.facebook)}</div>`:''}${st.youtube?`<div>YouTube: ${esc(st.youtube)}</div>`:''}<div style="margin-top:2mm;font-size:6.5pt">এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div></div>
+  <div class="if"><span class="cr">${CREDIT}</span></div></div></div>`;
 }
 
 /* ================= staff: join ================= */
@@ -620,14 +651,14 @@ function stfForm(){
    ${fld('t_edu','শিক্ষাগত যোগ্যতা',t.edu)}${fld('t_nid','এনআইডি নং',t.nid)}${fld('t_mobile','মোবাইল নং',t.mobile,'tel')}
    ${fld('t_salary','মাসিক বেতন (৳)',t.salary||'','number','min="0" step="any"')}
    ${area('t_perm','স্থায়ী ঠিকানা',t.perm,'full')}${area('t_pres','বর্তমান ঠিকানা',t.pres,'full')}
-  </div><div class="sec" style="margin-top:18px">সংযুক্তি ও স্বাক্ষর</div><div class="grid">${fileBox('t_photo','ছবি',t.photo,220,30000)}${sigBox('t_sig','কর্মীর স্বাক্ষর',t.sig)}${sigBox('t_dsig','পরিচালকের স্বাক্ষর',t.dirSig)}</div>${dirNote}
+  </div><div class="sec" style="margin-top:18px">সংযুক্তি ও স্বাক্ষর</div><div class="grid">${fileBox('t_photo','ছবি',t.photo,220,30000)}${sigBox('t_sig','কর্মীর স্বাক্ষর',t.sig)}</div>
   <div class="row"><button class="btn" onclick="saveStf()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('stf')">বাতিল</button>${nw?'':`<button class="btn ghost" onclick="printStf('${t.id}')">প্রিন্ট</button>`}</div></div>`;
 }
 async function saveStf(){
   if(!v('t_name'))return toast('নাম লিখুন');if(!v('t_desig'))return toast('পদবি লিখুন');
   const ex=DB.staff.find(x=>x.id===R.id),n=ex?0:DB.seq.staff+1;
-  const o={id:ex?ex.id:uid(),tid:ex?ex.tid:'স-'+pad(n,3),joinDate:v('t_date'),name:v('t_name'),father:v('t_father'),dob:v('t_dob'),desig:v('t_desig'),edu:v('t_edu'),nid:en(v('t_nid')),mobile:en(v('t_mobile')),salary:num('t_salary'),perm:v('t_perm'),pres:v('t_pres'),photo:FV.t_photo,sig:getSig('t_sig'),dirSig:getSig('t_dsig')};
-  const ops=[{op:'upsert',table:'staff',rec:o}];if(!ex)ops.push(seqOp({staff:n}));
+  const o={id:ex?ex.id:uid(),tid:ex?ex.tid:'স-'+pad(n,3),joinDate:v('t_date'),name:v('t_name'),father:v('t_father'),dob:v('t_dob'),desig:v('t_desig'),edu:v('t_edu'),nid:en(v('t_nid')),mobile:en(v('t_mobile')),salary:num('t_salary'),perm:v('t_perm'),pres:v('t_pres'),photo:FV.t_photo,sig:getSig('t_sig')};
+  const ops=[{op:'upsert',table:'staff',rec:wireK(o,ex,['sig'])}];if(!ex)ops.push(seqOp({staff:n}));
   if(!await work(()=>batch(ops)))return;
   o._full=true;if(ex)DB.staff[DB.staff.indexOf(ex)]=o;else{DB.staff.push(o);DB.seq.staff=n}
   toast('সংরক্ষিত');go('stf');
@@ -641,7 +672,7 @@ async function printStf(id){
   printHTML(`<div class="doc">${lh()}<div class="dt">শিক্ষক ও কর্মচারী জয়েন ফরম</div><div class="dmeta"><div>আইডি: <b>${bn(t.tid)}</b></div><div>জয়েনের তারিখ: <b>${fdate(t.joinDate)}</b></div></div>
   <div class="dtop"><div><table class="kv">${kvRows([['নাম',esc(t.name)],['পিতার নাম',esc(t.father)],['জন্ম তারিখ',fdate(t.dob)],['পদবি',esc(t.desig)],['যোগ্যতা',esc(t.edu)],['এনআইডি',bn(t.nid)],['মোবাইল',bn(t.mobile)],['মাসিক বেতন',tk(t.salary)]])}</table></div><div class="dphoto">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div></div>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(t.perm)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(t.pres)}</td></tr></table>
-  <div class="sigrow">${sg(t.sig,'কর্মীর স্বাক্ষর')}${sg(t.dirSig||DB.settings.directorSig,'পরিচালক')}</div></div>`);
+  <div class="sigrow">${sg(t.sig,'কর্মীর স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
 
 /* ================= staff: salary ================= */
@@ -675,7 +706,7 @@ function salForm(){
    ${fld('s_paid','প্রদত্ত (৳)',x.paid||'','number','min="0" step="any"')}
    ${area('s_note','মন্তব্য',x.note,'full')}
   </div><p class="note" id="s_warn"></p>
-  <div class="sec">স্বাক্ষর</div><div class="grid">${sigBox('s_r','গ্রহীতার স্বাক্ষর',x.sigRec)}${sigBox('s_d','পরিচালকের স্বাক্ষর',x.sigDir)}</div>${dirNote}
+  <div class="sec">স্বাক্ষর</div><div class="grid">${sigBox('s_r','গ্রহীতার স্বাক্ষর',x.sigRec)}</div>
   <div class="row"><button class="btn" onclick="saveSal()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('sal')">বাতিল</button></div></div>`;
 }
 function salPick(){const t=DB.staff.find(x=>x.id===v('s_st'));if(t)$('#s_base').value=t.salary||'';salCalc()}
@@ -687,8 +718,8 @@ async function saveSal(){
   if(!v('s_st'))return toast('কর্মী নির্বাচন করুন');if(!v('s_date')||!v('s_m'))return toast('তারিখ ও মাস দিন');
   const net=num('s_base')+num('s_extra')-num('s_ded'),paid=$('#s_paid').value===''?net:num('s_paid');
   const ex=DB.salaries.find(x=>x.id===R.id),no=ex?ex.no:DB.seq.salary+1;
-  const o={id:ex?ex.id:uid(),no,date:v('s_date'),month:v('s_m'),staffId:v('s_st'),base:num('s_base'),extra:num('s_extra'),ded:num('s_ded'),net,paid,note:v('s_note'),sigRec:getSig('s_r'),sigDir:getSig('s_d')};
-  const ops=[{op:'upsert',table:'salaries',rec:o}];if(!ex)ops.push(seqOp({salary:no}));
+  const o={id:ex?ex.id:uid(),no,date:v('s_date'),month:v('s_m'),staffId:v('s_st'),base:num('s_base'),extra:num('s_extra'),ded:num('s_ded'),net,paid,note:v('s_note'),sigRec:getSig('s_r')};
+  const ops=[{op:'upsert',table:'salaries',rec:wireK(o,ex,['sigRec'])}];if(!ex)ops.push(seqOp({salary:no}));
   if(!await work(()=>batch(ops)))return;
   o._full=true;if(ex)DB.salaries[DB.salaries.indexOf(ex)]=o;else{DB.salaries.push(o);DB.seq.salary=no}
   toast('সংরক্ষিত');go('sal');
@@ -700,7 +731,7 @@ async function printSal(id){
   printHTML(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
   <table class="kv">${kvRows([['নাম',esc(t.name)],['আইডি',bn(t.tid)],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
   <table class="kv"><tr><th>মূল বেতন</th><td class="n">${tk(x.base)}</td></tr><tr><th>ভাতা / বোনাস</th><td class="n">${tk(x.extra)}</td></tr><tr><th>কর্তন / অগ্রিম</th><td class="n">${tk(x.ded)}</td></tr><tr><th>নিট বেতন</th><td class="n"><b>${tk(x.net)}</b></td></tr><tr><th>প্রদত্ত</th><td class="n"><b>${tk(x.paid)}</b></td></tr></table>
-  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(x.sigDir||DB.settings.directorSig,'পরিচালক')}</div></div>`);
+  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
 
 /* ================= fee rules (table) ================= */
@@ -758,38 +789,48 @@ async function saveRules(){
 }
 
 /* ================= expenses ================= */
-let EXID=null,EXM='';
+let EXID=null,EXM='',ET=null;
+function etRows(){return ET.map((r,i)=>`<div class="erow"><input class="cell c" list="dl_c" value="${esc(r.cat)}" placeholder="খাত"><input class="cell m" type="number" min="0" step="any" value="${r.amount}" placeholder="টাকা" oninput="etSum()"><button class="btn sm danger" onclick="etDel(${i})" aria-label="মুছুন">✕</button></div>`).join('')}
+function etRead(){ET=[...document.querySelectorAll('#et .erow')].map(r=>({cat:r.querySelector('.c').value.trim(),amount:r.querySelector('.m').value}))}
+function etAdd(){etRead();ET.push({cat:'',amount:''});$('#et').innerHTML=etRows();etSum();const c=document.querySelectorAll('#et .erow .c');c[c.length-1].focus()}
+function etDel(i){etRead();ET.splice(i,1);if(!ET.length)ET.push({cat:'',amount:''});$('#et').innerHTML=etRows();etSum()}
+function etSum(){let s=0;document.querySelectorAll('#et .erow .m').forEach(i=>{s+=+en(i.value)||0});$('#et_total').textContent=tk(s)}
 function pExp(){
   const e=DB.expenses.find(x=>x.id===EXID)||{},nw=!e.id;
+  if(!ET)ET=e.id?((e.items&&e.items.length?e.items:[{cat:e.cat,amount:e.amount}]).map(i=>({cat:i.cat,amount:i.amount}))):[{cat:'',amount:''}];
+  AFTER=etSum;
   const rows=DB.expenses.filter(x=>!EXM||x.date.slice(0,7)===EXM).sort((a,b)=>b.no-a.no);
+  const itemsOf=x=>x.items&&x.items.length?x.items:[{cat:x.cat,amount:x.amount}];
   return `<div class="bar"><h1>খরচ</h1></div>
   <div class="panel"><div class="sec">${nw?'খরচ ফরম':'খরচ সম্পাদনা'}</div><div class="grid">
    ${fld('e_no','ভাউচার নং (অটো)',bn(nw?DB.seq.voucher+1:e.no),'text','readonly')}
    ${fld('e_date','তারিখ',e.date||today(),'date')}
-   <label class="fld"><span>খাত</span><input id="e_cat" list="dl_c" value="${esc(e.cat)}" placeholder="খাত নির্বাচন বা লিখুন"><datalist id="dl_c">${CATS.map(c=>`<option value="${c}">`).join('')}</datalist></label>
-   ${fld('e_amt','পরিমাণ (৳)',e.amount||'','number','min="0" step="any"')}
-   ${fld('e_to','কাকে প্রদান',e.to)}
-   ${area('e_desc','বিবরণ',e.desc,'full')}
-  </div><div class="row"><button class="btn" onclick="saveExp()">সংরক্ষণ করুন</button>${nw?'':'<button class="btn ghost" onclick="EXID=null;render()">বাতিল</button>'}</div></div>
+  </div>
+  <div class="sec" style="margin-top:18px">খাত ও টাকা</div>
+  <div id="et">${etRows()}</div><datalist id="dl_c">${CATS.map(c=>`<option value="${c}">`).join('')}</datalist>
+  <div class="bar" style="margin-top:6px"><button class="btn ghost" onclick="etAdd()">+ আরো যোগ করুন</button><b>মোট: <span id="et_total"></span></b></div>
+  <div class="row" style="margin-top:8px"><button class="btn" onclick="saveExp()">সংরক্ষণ করুন</button>${nw?'':'<button class="btn ghost" onclick="EXID=null;ET=null;render()">বাতিল</button>'}</div></div>
   <div class="panel"><div class="bar"><div class="sec" style="margin:0">খরচের তালিকা</div><label class="fld" style="flex-direction:row;align-items:center;gap:8px"><span>মাস</span><input type="month" value="${EXM}" onchange="EXM=this.value;render()" style="width:auto"></label></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>ভাউচার</th><th>তারিখ</th><th>খাত</th><th>বিবরণ</th><th>প্রদান</th><th class="n">পরিমাণ</th><th></th></tr></thead><tbody>
-  ${rows.map(x=>`<tr><td>${bn(x.no)}</td><td>${fdate(x.date)}</td><td>${esc(x.cat)}</td><td>${esc(x.desc)}</td><td>${esc(x.to)}</td><td class="n">${tk(x.amount)}</td><td><div class="acts"><button class="btn sm ghost" onclick="EXID='${x.id}';render();window.scrollTo(0,0)">সম্পাদনা</button><button class="btn sm ghost" onclick="printExp('${x.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delExp('${x.id}')">মুছুন</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="empty">কোনো খরচ নেই</td></tr>'}
-  </tbody>${rows.length?`<tfoot><tr><td colspan="5">মোট</td><td class="n">${tk(rows.reduce((t,x)=>t+x.amount,0))}</td><td></td></tr></tfoot>`:''}</table></div></div>`;
+  <div class="tw"><table class="tbl"><thead><tr><th>ভাউচার</th><th>তারিখ</th><th>খাত</th><th class="n">পরিমাণ</th><th></th></tr></thead><tbody>
+  ${rows.map(x=>`<tr><td>${bn(x.no)}</td><td>${fdate(x.date)}</td><td>${itemsOf(x).map(i=>`${esc(i.cat)}: ${tk(i.amount)}`).join('<br>')}</td><td class="n">${tk(x.amount)}</td><td><div class="acts"><button class="btn sm ghost" onclick="ET=null;EXID='${x.id}';render();window.scrollTo(0,0)">সম্পাদনা</button><button class="btn sm ghost" onclick="printExp('${x.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delExp('${x.id}')">মুছুন</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">কোনো খরচ নেই</td></tr>'}
+  </tbody>${rows.length?`<tfoot><tr><td colspan="3">মোট</td><td class="n">${tk(rows.reduce((t,x)=>t+x.amount,0))}</td><td></td></tr></tfoot>`:''}</table></div></div>`;
 }
 async function saveExp(){
-  if(!v('e_cat'))return toast('খাত লিখুন');if(num('e_amt')<=0)return toast('পরিমাণ দিন');if(!v('e_date'))return toast('তারিখ দিন');
+  etRead();
+  const items=ET.filter(r=>r.cat&&(+en(r.amount)||0)>0).map(r=>({cat:r.cat,amount:+en(r.amount)}));
+  if(!items.length)return toast('অন্তত একটি খাত ও টাকা দিন');if(!v('e_date'))return toast('তারিখ দিন');
   const ex=DB.expenses.find(x=>x.id===EXID),no=ex?ex.no:DB.seq.voucher+1;
-  const o={id:ex?ex.id:uid(),no,date:v('e_date'),cat:v('e_cat'),amount:num('e_amt'),to:v('e_to'),desc:v('e_desc')};
+  const o={id:ex?ex.id:uid(),no,date:v('e_date'),items,cat:items.map(i=>i.cat).join(', '),amount:items.reduce((t,i)=>t+i.amount,0)};
   const ops=[{op:'upsert',table:'expenses',rec:o}];if(!ex)ops.push(seqOp({voucher:no}));
   if(!await work(()=>batch(ops)))return;
   if(ex)DB.expenses[DB.expenses.indexOf(ex)]=o;else{DB.expenses.push(o);DB.seq.voucher=no}
-  EXID=null;render();toast('খরচ সংরক্ষিত');
+  EXID=null;ET=null;render();toast('খরচ সংরক্ষিত');
 }
 async function delExp(id){if(!await ask('এই খরচ মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'expenses',id}])))return;DB.expenses=DB.expenses.filter(x=>x.id!==id);render()}
 function printExp(id){
-  const x=DB.expenses.find(e=>e.id===id);
+  const x=DB.expenses.find(e=>e.id===id),items=x.items&&x.items.length?x.items:[{cat:x.cat,amount:x.amount}];
   printHTML(`<div class="doc rc">${lh()}<div class="dt">খরচের ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
-  <table class="kv">${kvRows([['খাত',esc(x.cat)],['পরিমাণ',tk(x.amount)],['কাকে প্রদান',esc(x.to)],['বিবরণ',esc(x.desc)]])}</table>
+  <table class="kv"><tr><th>খাত</th><th class="n">টাকা</th></tr>${items.map(i=>`<tr><td>${esc(i.cat)}</td><td class="n">${tk(i.amount)}</td></tr>`).join('')}<tr><th>মোট</th><th class="n">${tk(x.amount)}</th></tr></table>
   <div class="sigrow">${sg('','গ্রহীতা')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
 
@@ -828,11 +869,8 @@ function pSetup(){
    ${area('p_pl','অঙ্গীকারনামা',s.pledge,'full',5)}
    ${area('p_ap','অনুমোদন',s.approval,'full',3)}
   </div>
-  <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>
-  <div class="panel"><div class="sec">Google শীট সংযোগ</div><p class="note">সব ডেটা আপনার Google Sheet-এর ট্যাবে জমা হচ্ছে। ব্যাকআপের জন্য Google Sheet থেকে “File → Make a copy” করে রাখুন।</p>
-  <div class="row"><button class="btn ghost" onclick="pingApi()">সংযোগ পরীক্ষা</button><button class="btn ghost" onclick="reload()">ডেটা রিফ্রেশ</button><button class="btn danger" onclick="logout('')">লগআউট</button></div></div>`;
+  <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
 }
-async function pingApi(){if(await work(()=>api('ping')))toast('সংযোগ ঠিক আছে')}
 async function saveSetup(){
   const ex=DB.settings;
   const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL};
