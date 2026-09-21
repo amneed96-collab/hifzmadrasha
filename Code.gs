@@ -15,6 +15,7 @@ const NAMES = {
   staff: 'Staff',
   salaries: 'Salaries',
   expenses: 'Expenses',
+  notices: 'Notices',
   settings: 'Settings'
 };
 // বড় ছবি/স্বাক্ষর যেসব ঘরে থাকে সেগুলো আলাদা "Files" ট্যাবে টুকরো করে রাখা হয়

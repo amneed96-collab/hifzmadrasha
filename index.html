@@ -113,8 +113,9 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .lh{position:relative;border-bottom:2px solid #0A3D62;padding-bottom:8px;margin-bottom:10px;text-align:center;min-height:72px}
 .lh img{position:absolute;left:0;top:0;height:66px;width:66px;object-fit:cover;border-radius:50%}
 .lh .lt{padding:0 78px}
-.lh h2{margin:0;font-size:22px;color:#0A3D62}
-.lh p{margin:0;font-size:12px}
+.lh h2{margin:0 0 2px;font-size:30px;line-height:1.25;color:#0A3D62}
+.rc .lh h2{font-size:24px}
+.lh p{margin:0;font-size:12.5px}
 .dt{display:table;margin:8px auto;border:1.5px solid #0A3D62;border-radius:4px;padding:3px 26px;font-weight:700;font-size:16px;color:#0A3D62}
 .dmeta{display:flex;justify-content:space-between;margin-bottom:8px}
 .dtop{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
@@ -140,33 +141,47 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .rc .kv th{width:auto}
 .wmk{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:-1;pointer-events:none}
 .wmk img{width:62%;max-width:120mm;opacity:.08;filter:grayscale(1)}
-.pfoot{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:9.5px;color:#234;border-top:1px solid #0A3D62;padding-top:2px;background:#fff}
-.credit{position:fixed;right:-8mm;top:50%;writing-mode:vertical-rl;font-size:7px;color:#666;white-space:nowrap}
+.credit{position:fixed;right:0;bottom:-8mm;font-size:7px;color:#666;white-space:nowrap}
+#stage .credit{position:static;text-align:right;margin-top:8px}
 /* ID cards (portrait) */
 .cards{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
 .pair{display:flex;gap:4mm;break-inside:avoid}
 .idc{width:54mm;height:85.6mm;border:.3mm solid #0A3D62;border-radius:3mm;overflow:hidden;background:#fff;color:#000;display:flex;flex-direction:column;font-size:7.5pt;line-height:1.35;position:relative;z-index:0;break-inside:avoid}
 .idc .wm{position:absolute;left:50%;top:50%;width:34mm;transform:translate(-50%,-50%);opacity:.09;z-index:-1;filter:grayscale(1)}
-.idc .ih{background:#0A3D62;color:#fff;position:relative;height:14mm;display:flex;align-items:center;justify-content:center;padding:0 2mm 0 13mm;text-align:center}
-.idc .ih img{position:absolute;left:2mm;top:50%;transform:translateY(-50%);height:9.5mm;width:9.5mm;border-radius:50%;background:#fff;object-fit:cover}
-.idc .ih b{font-size:8.6pt;line-height:1.2}
-.idc .ib{display:flex;flex-direction:column;align-items:center;padding:2.5mm 3mm 0;flex:1;gap:.8mm}
-.idc .ph{width:23mm;height:28mm;border:.35mm solid #0A3D62;overflow:hidden;display:grid;place-items:center;font-size:7pt;color:#888}
+.idc .ih{background:#0A3D62;color:#fff;position:relative;min-height:15mm;display:flex;align-items:center;justify-content:center;padding:1.5mm 2mm 1.5mm 13mm;text-align:center}
+.idc .ih>img{position:absolute;left:2mm;top:50%;transform:translateY(-50%);height:9.5mm;width:9.5mm;border-radius:50%;background:#fff;object-fit:cover}
+.idc .ih .it b{display:block;font-size:8.4pt;line-height:1.2}
+.idc .ih .it small{display:block;font-size:5.8pt;line-height:1.25;opacity:.92;margin-top:.4mm}
+.idc .ib{display:flex;flex-direction:column;align-items:center;padding:2.5mm 3.5mm 0;flex:1;gap:.8mm}
+.idc .ph{width:23mm;height:28mm;border:.35mm solid #0A3D62;overflow:hidden;display:grid;place-items:center;font-size:7pt;color:#888;flex:none}
 .idc .ph img{width:100%;height:100%;object-fit:cover}
 .idc .nm{font-weight:700;font-size:10pt;color:#0A3D62;text-align:center;line-height:1.2;margin-top:1mm}
-.idc .rows{align-self:stretch;text-align:center;font-size:7.5pt}
-.idc .sb{text-align:center;padding:0 3mm 1mm}
-.idc .sb img{height:7mm;display:block;margin:0 auto;mix-blend-mode:multiply}
-.idc .sb span{display:block;border-top:.25mm solid #000;width:18mm;margin:0 auto;font-size:6.5pt}
-.idc .if{background:#1FA3C4;color:#03283B;text-align:center;font-size:7pt;font-weight:600;padding:1.2mm 2mm;min-height:6.5mm}
-.idc .bd{padding:3mm;flex:1;font-size:7.3pt}
-.idc .bd div{margin-bottom:1.2mm}
-.idc .cr{font-size:5.5pt;font-weight:400}
-#foot{background:var(--deep);color:#CFE3F1;text-align:center;font-size:13px;padding:16px 14px 12px;margin-top:8px;line-height:1.7}
+.kvc{border-collapse:collapse;width:100%;font-size:7.3pt;margin-top:.5mm}
+.kvc td{padding:.3mm 0;vertical-align:top}
+.kvc td.k{font-weight:700;white-space:nowrap;width:1%;padding-right:1mm}
+.kvc td.c{font-weight:700;width:2mm;text-align:center}
+.kvc td.v{text-align:left;padding-left:1mm}
+.idc .sb{text-align:right;padding:0 4mm 1mm}
+.idc .sb img{height:7mm;display:block;margin-left:auto;mix-blend-mode:multiply}
+.idc .sb span{display:block;border-top:.25mm solid #000;width:18mm;margin-left:auto;font-size:6.5pt;text-align:center}
+.idc .if{background:#0A3D62;color:#fff;text-align:center;font-size:7pt;font-weight:600;padding:1.2mm 2mm;min-height:6.5mm}
+.idc .if.back{font-size:6pt;font-weight:400;line-height:1.35}
+.idc .bd{padding:3mm 3.5mm;flex:1;font-size:7.3pt}
+.idc .bd .bh{font-weight:700;color:#0A3D62;margin-bottom:1mm}
+.idc .cr{font-size:5.3pt;font-weight:400;opacity:.85;margin-top:.6mm}
+#foot{background:var(--deep);color:#CFE3F1;font-size:13px;padding:16px 16px 12px;margin-top:8px;line-height:1.7}
 #foot:empty{display:none}
+#foot .fw{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1100px;margin:0 auto;text-align:left}
+#foot .fr{text-align:right}
 #foot b{color:#fff;font-size:15px}
 #foot a{color:#8FD6E8}
-#foot .cr{font-size:11px;opacity:.7;margin-top:4px}
+#foot .cr{font-size:11px;opacity:.75;margin-top:8px;text-align:center}
+@media(max-width:720px){#foot .fw{grid-template-columns:1fr}#foot .fr{text-align:left}}
+.sigrow.r{justify-content:flex-end}.sigrow.r .sgb{flex:none;width:170px}
+.ntc .ndate{text-align:right;font-weight:600}
+.ntc .ntitle{text-align:center;font-weight:700;font-size:18px;margin:14px 0 12px;text-decoration:underline;color:#0A3D62}
+.ntc .nbody{white-space:pre-wrap;font-size:15px;line-height:1.9;text-align:justify;min-height:110mm}
+#stage .ntc{width:794px;min-height:1123px;padding:40px 48px;background:#fff;box-sizing:border-box}
 .erow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
 .erow .c{flex:2;min-width:0}.erow .m{flex:1;min-width:0}
 @media(max-width:720px){.two{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.kpi.hero{grid-column:span 1}main{padding:12px}}
@@ -174,11 +189,10 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea{display:none}
 #stage{display:block;position:fixed;left:-10000px;top:0;width:640px;background:#fff}
 #stage .wmk{position:absolute}
-#stage .pfoot{position:static;margin-top:10px}
-@media print{
+#stage @media print{
  body{background:#fff}
  #app,#toast,#dlg,#busy{display:none!important}
- #printArea{display:block;position:relative;z-index:0;padding-bottom:12mm}
+ #printArea{display:block;position:relative;z-index:0}
  #stage{display:none}
  @page{size:A4;margin:10mm 12mm}
  .cards{zoom:1;gap:4mm}
@@ -241,7 +255,7 @@ const busy=on=>$('#busy').classList.toggle('show',!!on);
 const setStat=t=>{const e=$('#stat');if(e)e.textContent=t};
 
 /* ================= data + Google Sheet API ================= */
-const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
+const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
 let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
 const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created']);
@@ -274,7 +288,7 @@ async function reload(){
   busy(true);setStat('লোড হচ্ছে…');
   try{
     const d=await api('list');
-    ['students','collections','feeRules','staff','salaries','expenses'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
+    ['students','collections','feeRules','staff','salaries','expenses','notices'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
     const st=norm(d.settings||{});const sq=st.seq||{};delete st.seq;delete st.id;
     DB.settings=Object.assign(defDB().settings,st);
     if(!DB.settings.pledge)DB.settings.pledge=PLEDGE;if(!DB.settings.approval)DB.settings.approval=APPROVAL;
@@ -314,20 +328,20 @@ const area=(id,label,val,cls,rows)=>`<label class="fld ${cls||''}"><span>${label
 /* ================= printing ================= */
 const CREDIT='@AM Shahed: 01605721296';
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
-function footLine(){const s=DB.settings;return [s.address&&esc(s.address),s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp),s.facebook&&'Facebook: '+esc(s.facebook),s.youtube&&'YouTube: '+esc(s.youtube)].filter(Boolean).join(' &nbsp;|&nbsp; ')}
 function printHTML(h,o){o=o||{};
-  $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h+(o.nofoot?'':`<div class="pfoot">${footLine()}</div>`)+(o.nocredit?'':`<div class="credit">${CREDIT}</div>`);
+  $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h+(o.nocredit?'':`<div class="credit">${CREDIT}</div>`);
   setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
-function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${s.founded?`<p>প্রতিষ্ঠাকাল: ${bn(s.founded)}</p>`:''}<p>${esc(s.address)}</p><p>${c}</p></div></div>`}
+function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
 const sg=(src,label)=>`<div class="sgb">${src&&src!=='@'?`<img class="sigimg" src="${src}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">${label}</div></div>`;
 const kvRows=p=>{let h='';for(let i=0;i<p.length;i+=2){const a=p[i],b=p[i+1];h+=`<tr><th>${a[0]}</th><td>${a[1]||'&nbsp;'}</td>${b?`<th>${b[0]}</th><td>${b[1]||'&nbsp;'}</td>`:'<td colspan="2"></td>'}</tr>`}return h};
 function siteFooter(){const s=DB.settings;
   const lk=(u,tx)=>u?(/^https?:\/\//i.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${tx}</a>`:`${tx}: ${esc(u)}`):'';
   let wn=en(s.whatsapp||'').replace(/\D/g,'');if(wn.startsWith('0'))wn='88'+wn;
   const wa=wn?`<a href="https://wa.me/${wn}" target="_blank" rel="noopener">WhatsApp: ${bn(s.whatsapp)}</a>`:'';
-  const parts=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),wa,lk(s.facebook,'Facebook'),lk(s.youtube,'YouTube')].filter(Boolean);
-  return `<b>${esc(s.name||'')}</b>${s.address?`<div>${esc(s.address)}</div>`:''}${parts.length?`<div>${parts.join(' &nbsp;·&nbsp; ')}</div>`:''}<div class="cr">${CREDIT}</div>`}
+  const left=[s.address&&esc(s.address),s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),wa].filter(Boolean).map(x=>`<div>${x}</div>`).join('');
+  const right=[lk(s.facebook,'Facebook'),lk(s.youtube,'YouTube')].filter(Boolean).map(x=>`<div>${x}</div>`).join('');
+  return `<div class="fw"><div class="fl"><b>${esc(s.name||'')}</b>${left}</div><div class="fr">${right}</div></div><div class="cr">${CREDIT}</div>`}
 
 /* ================= fee logic ================= */
 function feeAmount(r,month){let a=0;r.history.slice().sort((x,y)=>x.from<y.from?-1:1).forEach(h=>{if(h.from<=month)a=h.amount});return a}
@@ -366,7 +380,7 @@ const MENU=[
  {k:'rules',t:'ফি নির্ধারণ'},
  {k:'exp',t:'খরচ'},
  {t:'রিপোর্ট',sub:[['rm','মাসিক'],['ry','বাৎসরিক'],['rt','সর্বমোট']]},
- {t:'ব্যবস্থাপনা',sub:[['setup','প্রতিষ্ঠান সেটাপ']]}
+ {t:'ব্যবস্থাপনা',sub:[['setup','প্রতিষ্ঠান সেটাপ'],['ntc','নোটিশ']]}
 ];
 const OPEN={};
 let R={page:'dash',view:'list',id:null},AFTER=null;
@@ -389,7 +403,7 @@ function render(){
   AFTER=null;const s=DB.settings;
   $('#brand').innerHTML=(s.logo?`<img src="${s.logo}" alt="">`:'')+esc(s.name||'হিফয মাদরাসা');
   const f=R.view==='form';
-  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup};
+  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
   $('#main').innerHTML=map[R.page]();
   if(AFTER)AFTER();drawMenu();$('#foot').innerHTML=siteFooter();
 }
@@ -593,13 +607,18 @@ function receiptDoc(c){
 async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printHTML(receiptDoc(c))}catch(e){handleErr(e)}}
 async function shareRc(id){
   let c;try{c=await hydrate('collections',DB.collections.find(x=>x.id===id))}catch(e){return handleErr(e)}
-  const st=$('#stage');st.innerHTML=receiptDoc(c);st.firstElementChild.insertAdjacentHTML('afterbegin',wmHTML());st.firstElementChild.insertAdjacentHTML('beforeend',`<div class="pfoot">${footLine()}</div>`);
+  shareDoc(receiptDoc(c),'receipt-'+c.receiptNo+'.png','ফি রশিদ',640);
+}
+async function shareDoc(html,fname,title,width){
+  const st=$('#stage');st.style.width=width+'px';st.innerHTML=html;const el=st.firstElementChild;
+  el.insertAdjacentHTML('afterbegin',wmHTML());el.insertAdjacentHTML('beforeend',`<div class="credit">${CREDIT}</div>`);
   if(!window.html2canvas){st.innerHTML='';return toast('ইমেজ তৈরির জন্য ইন্টারনেট প্রয়োজন')}
-  try{const cv=await html2canvas(st.firstElementChild,{scale:2,backgroundColor:'#fff'});
-    cv.toBlob(async b=>{const f=new File([b],'receipt-'+c.receiptNo+'.png',{type:'image/png'});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'ফি রশিদ'})}catch(e){}}
-      else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;a.click();toast('ইমেজ ডাউনলোড হয়েছে')}
-      st.innerHTML=''},'image/png')}catch(e){st.innerHTML='';toast('ইমেজ তৈরি করা যায়নি')}
+  busy(true);
+  try{const cv=await html2canvas(el,{scale:2,backgroundColor:'#fff'});
+    cv.toBlob(async b=>{busy(false);const f=new File([b],fname,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title})}catch(e){}}
+      else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;a.click();toast('ইমেজ ডাউনলোড হয়েছে')}
+      st.innerHTML=''},'image/png')}catch(e){busy(false);st.innerHTML='';toast('ইমেজ তৈরি করা যায়নি')}
 }
 
 /* ================= students: ID card ================= */
@@ -616,14 +635,17 @@ function idcFill(){const all=document.querySelector('input[name=idm]:checked').v
 function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`,{nowm:true,nofoot:true,nocredit:true})}
 function idCard(s){
   const st=DB.settings,wm=st.logo?`<img class="wm" src="${st.logo}" alt="">`:'',lg=st.logo?`<img src="${st.logo}" alt="">`:'';
-  const head=`<div class="ih">${lg}<b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b></div>`;
+  const head=`<div class="ih">${lg}<div class="it"><b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b>${st.address?`<small>${esc(st.address)}</small>`:''}</div></div>`;
+  const row=(k,val)=>`<tr><td class="k">${k}</td><td class="c">:</td><td class="v">${val}</td></tr>`;
+  const same=!s.presAddr||s.presAddr===s.permAddr;
+  const addr=same?(s.permAddr||s.presAddr?row('ঠিকানা',esc(s.permAddr||s.presAddr)):''):row('স্থায়ী',esc(s.permAddr))+row('বর্তমান',esc(s.presAddr));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(s.name)}</div>
-  <div class="rows"><div>আইডি: <b>${bn(s.sid)}</b></div><div>বিভাগ: ${s.dept} (${s.type})</div>${s.blood?`<div>রক্তের গ্রুপ: ${esc(s.blood)}</div>`:''}<div>অভিভাবক: ${bn(s.gMobile||s.fMobile||'')}</div></div></div>
+  <table class="kvc">${row('আইডি',bn(s.sid))}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',bn(s.gMobile||s.fMobile||''))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
-  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):esc(st.name)}</div></div>
-  <div class="idc">${wm}${head}<div class="bd"><div>ঠিকানা: ${esc(st.address)}</div>${st.directorMobile?`<div>যোগাযোগ: ${bn(st.directorMobile)}</div>`:''}${st.whatsapp?`<div>WhatsApp: ${bn(st.whatsapp)}</div>`:''}${st.facebook?`<div>Facebook: ${esc(st.facebook)}</div>`:''}${st.youtube?`<div>YouTube: ${esc(st.youtube)}</div>`:''}<div style="margin-top:2mm;font-size:6.5pt">এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div></div>
-  <div class="if"><span class="cr">${CREDIT}</span></div></div></div>`;
+  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
+  <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table></div>
+  <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
 }
 
 /* ================= staff: join ================= */
@@ -878,6 +900,40 @@ async function saveSetup(){
   Object.assign(DB.settings,rec,{directorSig:getSig('p_sig')});delete DB.settings.id;
   render();toast('সেটাপ সংরক্ষিত');
 }
+
+/* ================= notices ================= */
+function noticeDoc(n){const s=DB.settings;
+  return `<div class="doc ntc">${lh()}<div class="dt">নোটিশ</div><div class="ndate">তারিখ: ${fdate(n.date)}</div><div class="ntitle">${esc(n.title)}</div><div class="nbody">${esc(n.body)}</div>
+  <div class="sigrow r"><div class="sgb">${s.directorSig?`<img class="sigimg" src="${s.directorSig}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">পরিচালক</div>${s.director?`<div style="font-size:12px">${esc(s.director)}</div>`:''}</div></div></div>`}
+function ntcList(){
+  AFTER=fillNtc;
+  return `<div class="bar"><h1>নোটিশ</h1><button class="btn" onclick="go('ntc','form')">+ নতুন নোটিশ</button></div>
+  <div class="panel"><div class="filters" style="grid-template-columns:1fr"><input id="q" placeholder="শিরোনাম দিয়ে খুঁজুন" oninput="fillNtc()"></div><p class="cnt" id="cnt"></p>
+  <div class="tw"><table class="tbl"><thead><tr><th>তারিখ</th><th>শিরোনাম</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
+}
+function fillNtc(){
+  const q=v('q').toLowerCase();const rows=DB.notices.filter(n=>!q||n.title.toLowerCase().includes(q)).sort((a,b)=>b.date>a.date?1:b.date<a.date?-1:0);
+  $('#cnt').textContent='মোট '+bn(rows.length)+' টি';
+  $('#tb').innerHTML=rows.map(n=>`<tr><td>${fdate(n.date)}</td><td>${esc(n.title)}</td><td><div class="acts"><button class="btn sm ghost" onclick="go('ntc','form','${n.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printNtc('${n.id}')">প্রিন্ট</button><button class="btn sm ghost" onclick="shareNtc('${n.id}')">শেয়ার</button><button class="btn sm danger" onclick="delNtc('${n.id}')">মুছুন</button></div></td></tr>`).join('')||'<tr><td colspan="3" class="empty">কোনো নোটিশ নেই</td></tr>';
+}
+function ntcForm(){
+  const n=DB.notices.find(x=>x.id===R.id)||{},nw=!n.id;
+  return `<div class="bar"><h1>${nw?'নতুন নোটিশ':'নোটিশ সম্পাদনা'}</h1><button class="btn ghost" onclick="go('ntc')">← তালিকা</button></div>
+  <div class="panel"><div class="grid">${fld('n_date','তারিখ',n.date||today(),'date')}${fld('n_title','শিরোনাম',n.title,'text','class="" ')}${area('n_body','বিস্তারিত',n.body,'full',12)}</div>
+  <p class="note">পরিচালকের স্বাক্ষর “প্রতিষ্ঠান সেটাপ” থেকে স্বয়ংক্রিয়ভাবে বসবে।</p>
+  <div class="row"><button class="btn" onclick="saveNtc()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('ntc')">বাতিল</button>${nw?'':`<button class="btn ghost" onclick="printNtc('${n.id}')">প্রিন্ট</button><button class="btn ghost" onclick="shareNtc('${n.id}')">শেয়ার</button>`}</div></div>`;
+}
+async function saveNtc(){
+  if(!v('n_title'))return toast('শিরোনাম লিখুন');if(!v('n_date'))return toast('তারিখ দিন');
+  const ex=DB.notices.find(x=>x.id===R.id);
+  const o={id:ex?ex.id:uid(),date:v('n_date'),title:v('n_title'),body:$('#n_body').value.trim()};
+  if(!await work(()=>batch([{op:'upsert',table:'notices',rec:o}])))return;
+  if(ex)DB.notices[DB.notices.indexOf(ex)]=o;else DB.notices.push(o);
+  toast('নোটিশ সংরক্ষিত');go('ntc');
+}
+async function delNtc(id){if(!await ask('এই নোটিশ মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'notices',id}])))return;DB.notices=DB.notices.filter(n=>n.id!==id);render();toast('মুছে ফেলা হয়েছে')}
+function printNtc(id){printHTML(noticeDoc(DB.notices.find(n=>n.id===id)))}
+function shareNtc(id){const n=DB.notices.find(x=>x.id===id);shareDoc(noticeDoc(n),'notice-'+n.date+'.png','নোটিশ',794)}
 
 boot();
 </script>
