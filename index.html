@@ -177,6 +177,11 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #foot a{color:#8FD6E8}
 #foot .cr{font-size:11px;opacity:.75;margin-top:8px;text-align:center}
 @media(max-width:720px){#foot .fw{grid-template-columns:1fr}#foot .fr{text-align:left}}
+.rcwrap{max-width:600px;margin:0 auto}
+.rcwrap .doc.rc{max-width:none}
+.rc .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1}
+.rc .wmk.in img{width:55%;max-width:none}
+.rccredit{text-align:right;font-size:7px;color:#666;margin-top:3px}
 .sigrow.r{justify-content:flex-end}.sigrow.r .sgb{flex:none;width:170px}
 .ntc .ndate{text-align:right;font-weight:600}
 .ntc .ntitle{text-align:center;font-weight:700;font-size:18px;margin:14px 0 12px;text-decoration:underline;color:#0A3D62}
@@ -189,7 +194,8 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea{display:none}
 #stage{display:block;position:fixed;left:-10000px;top:0;width:640px;background:#fff}
 #stage .wmk{position:absolute}
-#stage @media print{
+#stage .credit{position:static;text-align:right;margin-top:8px}
+@media print{
  body{background:#fff}
  #app,#toast,#dlg,#busy{display:none!important}
  #printArea{display:block;position:relative;z-index:0}
@@ -327,6 +333,9 @@ const area=(id,label,val,cls,rows)=>`<label class="fld ${cls||''}"><span>${label
 
 /* ================= printing ================= */
 const CREDIT='@AM Shahed: 01605721296';
+const wmIn=()=>DB.settings.logo?`<div class="wmk in"><img src="${DB.settings.logo}" alt=""></div>`:'';
+const boxed=h=>'<div class="rcwrap">'+h.replace('<div class="doc rc">','<div class="doc rc">'+wmIn())+`<div class="rccredit">${CREDIT}</div></div>`;
+const printBox=h=>printHTML(boxed(h),{nowm:true,nocredit:true});
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
 function printHTML(h,o){o=o||{};
   $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h+(o.nocredit?'':`<div class="credit">${CREDIT}</div>`);
@@ -518,7 +527,7 @@ function admissionDoc(s){
   return `<div class="doc">${lh()}<div class="dt">ভর্তি ফরম</div>
   <div class="dmeta"><div>ফরম নং: <b>${bn(s.formNo)}</b></div><div>আইডি: <b>${bn(s.sid)}</b></div><div>ভর্তির তারিখ: <b>${fdate(s.admDate)}</b></div></div>
   <div class="dtop"><div><table class="kv">${kvRows([['বিভাগ',s.dept],['ধরণ',s.type],['নাম',esc(s.name)],['জন্ম তারিখ',fdate(s.dob)],['বয়স',age(s.dob)],['রক্তের গ্রুপ',esc(s.blood)]])}</table></div><div class="dphoto">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div></div>
-  <table class="kv">${kvRows([['পিতার নাম',esc(s.fName)],['পেশা',esc(s.fJob)],['মোবাইল',bn(s.fMobile)],['মাতার নাম',esc(s.mName)],['পেশা',esc(s.mJob)],['মোবাইল',bn(s.mMobile)],['অভিভাবক',esc(s.gName)],['সম্পর্ক',esc(s.gRel)],['মোবাইল',bn(s.gMobile)]])}</table>
+  <table class="kv"><tr><th></th><th>নাম</th><th>পেশা / সম্পর্ক</th><th>মোবাইল</th></tr><tr><th>পিতা</th><td>${esc(s.fName)}</td><td>${esc(s.fJob)}</td><td>${bn(s.fMobile)}</td></tr><tr><th>মাতা</th><td>${esc(s.mName)}</td><td>${esc(s.mJob)}</td><td>${bn(s.mMobile)}</td></tr><tr><th>অভিভাবক</th><td>${esc(s.gName)}</td><td>${esc(s.gRel)}</td><td>${bn(s.gMobile)}</td></tr></table>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(s.permAddr)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(s.presAddr)}</td></tr></table>
   <div class="dh3">অঙ্গীকারনামা</div><div>${esc(st.pledge)} ${s.pledge?'<b>(সম্মত)</b>':''}</div>
   <div class="sigrow">${sg(s.sigStu,'শিক্ষার্থীর স্বাক্ষর')}${sg(s.sigGua,'অভিভাবকের স্বাক্ষর')}</div>
@@ -604,14 +613,14 @@ function receiptDoc(c){
   ${c.note?`<div>মন্তব্য: ${esc(c.note)}</div>`:''}
   <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
 }
-async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printHTML(receiptDoc(c))}catch(e){handleErr(e)}}
+async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printBox(receiptDoc(c))}catch(e){handleErr(e)}}
 async function shareRc(id){
   let c;try{c=await hydrate('collections',DB.collections.find(x=>x.id===id))}catch(e){return handleErr(e)}
-  shareDoc(receiptDoc(c),'receipt-'+c.receiptNo+'.png','ফি রশিদ',640);
+  shareDoc(boxed(receiptDoc(c)),'receipt-'+c.receiptNo+'.png','ফি রশিদ',640,true);
 }
-async function shareDoc(html,fname,title,width){
+async function shareDoc(html,fname,title,width,raw){
   const st=$('#stage');st.style.width=width+'px';st.innerHTML=html;const el=st.firstElementChild;
-  el.insertAdjacentHTML('afterbegin',wmHTML());el.insertAdjacentHTML('beforeend',`<div class="credit">${CREDIT}</div>`);
+  if(!raw){el.insertAdjacentHTML('afterbegin',wmHTML());el.insertAdjacentHTML('beforeend',`<div class="credit">${CREDIT}</div>`)}
   if(!window.html2canvas){st.innerHTML='';return toast('ইমেজ তৈরির জন্য ইন্টারনেট প্রয়োজন')}
   busy(true);
   try{const cv=await html2canvas(el,{scale:2,backgroundColor:'#fff'});
@@ -750,7 +759,7 @@ async function delSal(id){if(!await ask('এই বেতনের রেকর�
 async function printSal(id){
   let x;try{x=await hydrate('salaries',DB.salaries.find(s=>s.id===id))}catch(e){return handleErr(e)}
   const t=DB.staff.find(s=>s.id===x.staffId)||{name:'',desig:'',tid:''};
-  printHTML(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
+  printBox(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
   <table class="kv">${kvRows([['নাম',esc(t.name)],['আইডি',bn(t.tid)],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
   <table class="kv"><tr><th>মূল বেতন</th><td class="n">${tk(x.base)}</td></tr><tr><th>ভাতা / বোনাস</th><td class="n">${tk(x.extra)}</td></tr><tr><th>কর্তন / অগ্রিম</th><td class="n">${tk(x.ded)}</td></tr><tr><th>নিট বেতন</th><td class="n"><b>${tk(x.net)}</b></td></tr><tr><th>প্রদত্ত</th><td class="n"><b>${tk(x.paid)}</b></td></tr></table>
   ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
@@ -771,7 +780,7 @@ function pRules(){
   if(!RT)rtInit();
   const heads=[...new Set([...DB.feeRules.map(r=>r.head),...DEFAULT_FEES.map(d=>d[0])])];
   const opt=(a,val)=>a.map(o=>{const p=Array.isArray(o)?o:[o,o];return `<option value="${esc(p[0])}" ${p[0]===val?'selected':''}>${esc(p[1])}</option>`}).join('');
-  return `<div class="bar"><h1>ফি নির্ধারণ ও বৃদ্ধি ফরম</h1><div class="acts"><button class="btn ghost" onclick="rtAdd()">+ আরো ফি যোগ করুন</button><button class="btn" onclick="saveRules()">সংরক্ষণ করুন</button></div></div>
+  return `<div class="bar"><h1>ফি নির্ধারণ ও বৃদ্ধি ফরম</h1></div>
   <div class="panel"><div class="tw"><table class="tbl" id="rt"><thead><tr><th>খাত</th><th>বিভাগ</th><th>ধরণ</th><th>ফির ধরন</th><th class="n">পরিমাণ (৳)</th><th>কার্যকর মাস</th><th>ইতিহাস</th><th></th></tr></thead><tbody>
   ${RT.map((r,i)=>{const rule=DB.feeRules.find(x=>x.id===r.id);return `<tr><td><input class="cell h" list="dl_h" value="${esc(r.head)}" placeholder="খাতের নাম"></td>
    <td><select class="cell d">${opt(['সকল',...DEPTS],r.dept)}</select></td><td><select class="cell t">${opt(['সকল',...TYPES],r.type)}</select></td><td><select class="cell q">${opt(FREQ,r.freq)}</select></td>
@@ -779,12 +788,7 @@ function pRules(){
    <td class="note">${rule?rule.history.slice().sort((a,b)=>a.from<b.from?-1:1).map(h=>`${fmonth(h.from)}: ${tk(h.amount)}`).join('<br>'):'—'}</td>
    <td><button class="btn sm danger" onclick="rtDel(${i})" aria-label="সারি মুছুন">✕</button></td></tr>`}).join('')||'<tr><td colspan="8" class="empty">কোনো সারি নেই</td></tr>'}
   </tbody></table></div><datalist id="dl_h">${heads.map(h=>`<option value="${esc(h)}">`).join('')}</datalist>
-  <div class="row"><button class="btn ghost" onclick="rtAdd()">+ আরো ফি যোগ করুন</button><button class="btn" onclick="saveRules()">সংরক্ষণ করুন</button></div></div>
-  <div class="panel"><div class="sec">কীভাবে কাজ করে</div>
-  <p class="note" style="margin:0 0 6px"><b>নতুন ফি:</b> পরিমাণ লিখে সংরক্ষণ করুন। ফাঁকা পরিমাণের নতুন সারি সংরক্ষিত হয় না।</p>
-  <p class="note" style="margin:0 0 6px"><b>ফি বৃদ্ধি:</b> পরিমাণ বদলান এবং “কার্যকর মাস” নতুন মাসে দিন — ওই মাস থেকে নতুন হার ধরা হবে, আগের মাসের হিসাব অপরিবর্তিত থাকবে। কার্যকর মাস না বদলালে আগের হারটিই সংশোধন হয়ে যাবে।</p>
-  <p class="note" style="margin:0 0 6px"><b>প্রতি মাসে:</b> ভর্তির মাস থেকে প্রতি মাসে ধরা হয় (যেমন মাসিক বেতন)। <b>এককালীন:</b> ভর্তির সময় একবার (যেমন ভর্তি ফি, কিতাব)। <b>নির্ধারিত মাসে:</b> কার্যকর মাসে একবার, ওই মাসের আগে ভর্তি সবার জন্য (যেমন পরীক্ষা, অনুষ্ঠান, শিক্ষা সফর); পরের বছর একই খাতে নতুন মাস দিয়ে আবার ধরা যায়।</p>
-  <p class="note" style="margin:0"><b>বিভাগ/ধরণ “সকল”</b> মানে সব শিক্ষার্থীর জন্য প্রযোজ্য।</p></div>`;
+  <div class="row"><button class="btn ghost" onclick="rtAdd()">+ আরো ফি যোগ করুন</button><button class="btn" onclick="saveRules()">সংরক্ষণ করুন</button></div></div>`;
 }
 async function saveRules(){
   rtRead();
@@ -851,7 +855,7 @@ async function saveExp(){
 async function delExp(id){if(!await ask('এই খরচ মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'expenses',id}])))return;DB.expenses=DB.expenses.filter(x=>x.id!==id);render()}
 function printExp(id){
   const x=DB.expenses.find(e=>e.id===id),items=x.items&&x.items.length?x.items:[{cat:x.cat,amount:x.amount}];
-  printHTML(`<div class="doc rc">${lh()}<div class="dt">খরচের ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
+  printBox(`<div class="doc rc">${lh()}<div class="dt">খরচের ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
   <table class="kv"><tr><th>খাত</th><th class="n">টাকা</th></tr>${items.map(i=>`<tr><td>${esc(i.cat)}</td><td class="n">${tk(i.amount)}</td></tr>`).join('')}<tr><th>মোট</th><th class="n">${tk(x.amount)}</th></tr></table>
   <div class="sigrow">${sg('','গ্রহীতা')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
