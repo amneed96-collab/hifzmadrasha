@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0A3D62">
 <title>হিফয মাদরাসা ব্যবস্থাপনা</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="config.js"></script>
 <style>
 :root{--sea:#0A3D62;--sea2:#0F5A8F;--deep:#062A44;--aqua:#1FA3C4;--ink:#10212E;--mute:#56707F;--bg:#E9F1F7;--line:#CBDCE8;--field:#B3C7D6;--red:#B3392B;--ok:#1F7A5A;--tint:#EEF5FA}
@@ -141,7 +142,6 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .rc .kv th{width:auto}
 .wmk{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:-1;pointer-events:none}
 .wmk img{width:62%;max-width:120mm;opacity:.08;filter:grayscale(1)}
-.credit{position:fixed;right:0;bottom:-8mm;font-size:7px;color:#666;white-space:nowrap}
 #stage .credit{position:static;text-align:right;margin-top:8px}
 /* ID cards (portrait) */
 .cards{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
@@ -166,7 +166,10 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .idc .sb span{display:block;border-top:.25mm solid #000;width:18mm;margin-left:auto;font-size:6.5pt;text-align:center}
 .idc .if{background:#0A3D62;color:#fff;text-align:center;font-size:7pt;font-weight:600;padding:1.2mm 2mm;min-height:6.5mm}
 .idc .if.back{font-size:6pt;font-weight:400;line-height:1.35}
-.idc .bd{padding:3mm 3.5mm;flex:1;font-size:7.3pt}
+.idc .bd{padding:3mm 3.5mm;flex:1;font-size:7.3pt;display:flex;flex-direction:column}
+.idc .bd .qr{margin-top:auto;text-align:center;padding-top:1.5mm}
+.idc .bd .qr img{width:17mm;height:17mm;object-fit:contain}
+.idc .bd .qr .qrl{font-size:5.3pt;color:#0A3D62;margin-top:.5mm}
 .idc .bd .bh{font-weight:700;color:#0A3D62;margin-bottom:1mm}
 .idc .cr{font-size:5.3pt;font-weight:400;opacity:.85;margin-top:.6mm}
 #foot{background:var(--deep);color:#CFE3F1;font-size:13px;padding:16px 16px 12px;margin-top:8px;line-height:1.7}
@@ -205,6 +208,8 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
  .pair{margin:0 auto 4mm}
  .idc,.kv th,.lh,.dphoto,.idc .ih,.idc .if,.wmk img{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+@page pgc{size:A4;margin:10mm 12mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
+#printArea.pgc{page:pgc}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -338,7 +343,8 @@ const boxed=h=>'<div class="rcwrap">'+h.replace('<div class="doc rc">','<div cla
 const printBox=h=>printHTML(boxed(h),{nowm:true,nocredit:true});
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
 function printHTML(h,o){o=o||{};
-  $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h+(o.nocredit?'':`<div class="credit">${CREDIT}</div>`);
+  $('#printArea').className=o.nocredit?'':'pgc';
+  $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h;
   setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
 function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
@@ -642,18 +648,28 @@ function pIdc(){
 function idList(){const all=document.querySelector('input[name=idm]:checked').value==='all';if(all){const d=v('iddept');return DB.students.filter(s=>!d||s.dept===d)}const s=DB.students.find(x=>x.id===v('idst'));return s?[s]:[]}
 function idcFill(){const all=document.querySelector('input[name=idm]:checked').value==='all';$('#idone').style.display=all?'none':'';$('#idall').style.display=all?'':'none';const l=idList();$('#idprev').innerHTML=l.map(idCard).join('')||'<p class="empty" style="grid-column:1/-1">শিক্ষার্থী নির্বাচন করুন</p>'}
 function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`,{nowm:true,nofoot:true,nocredit:true})}
+function statusURL(s){
+  if(!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0||!DB.settings.viewKey)return '';
+  return CFG.API_URL+'?action=studentStatus&id='+encodeURIComponent(s.sid)+'&k='+encodeURIComponent(DB.settings.viewKey);
+}
+function qrDataURL(text,size){
+  if(typeof QRCode==='undefined')return '';
+  try{const div=document.createElement('div');new QRCode(div,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});
+    const c=div.querySelector('canvas');return c?c.toDataURL('image/png'):''}catch(e){return ''}
+}
 function idCard(s){
   const st=DB.settings,wm=st.logo?`<img class="wm" src="${st.logo}" alt="">`:'',lg=st.logo?`<img src="${st.logo}" alt="">`:'';
   const head=`<div class="ih">${lg}<div class="it"><b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b>${st.address?`<small>${esc(st.address)}</small>`:''}</div></div>`;
   const row=(k,val)=>`<tr><td class="k">${k}</td><td class="c">:</td><td class="v">${val}</td></tr>`;
   const same=!s.presAddr||s.presAddr===s.permAddr;
+  const url=statusURL(s),qr=url?qrDataURL(url,160):'';
   const addr=same?(s.permAddr||s.presAddr?row('ঠিকানা',esc(s.permAddr||s.presAddr)):''):row('স্থায়ী',esc(s.permAddr))+row('বর্তমান',esc(s.presAddr));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(s.name)}</div>
   <table class="kvc">${row('আইডি',bn(s.sid))}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',bn(s.gMobile||s.fMobile||''))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
   <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
-  <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table></div>
+  <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে হিসাব দেখুন</div></div>`:''}</div>
   <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
 }
 
@@ -895,11 +911,16 @@ function pSetup(){
    ${area('p_pl','অঙ্গীকারনামা',s.pledge,'full',5)}
    ${area('p_ap','অনুমোদন',s.approval,'full',3)}
   </div>
+  <div class="sec">আইডি কার্ড QR — যাচাই কোড</div>
+  <div class="grid"><div class="fld full"><span>এই কোড আইডি কার্ডের QR-এ বসে; পরিবর্তন করলে আগের সব ছাপানো কার্ডের QR অকার্যকর হয়ে যাবে</span>
+   <div style="display:flex;gap:8px"><input id="p_vk" readonly value="${esc(s.viewKey||genKey())}"><button type="button" class="btn sm ghost" onclick="regenVK()">নতুন কোড তৈরি</button></div></div></div>
   <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
 }
+function genKey(){return uid()+uid()}
+async function regenVK(){if(!await ask('নতুন কোড তৈরি করলে আগের সব আইডি কার্ডের QR অকার্যকর হয়ে যাবে। নিশ্চিত?'))return;$('#p_vk').value=genKey()}
 async function saveSetup(){
   const ex=DB.settings;
-  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL};
+  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,viewKey:v('p_vk')||genKey()};
   if(!await work(()=>batch([{op:'upsert',table:'settings',rec}])))return;
   Object.assign(DB.settings,rec,{directorSig:getSig('p_sig')});delete DB.settings.id;
   render();toast('সেটাপ সংরক্ষিত');
