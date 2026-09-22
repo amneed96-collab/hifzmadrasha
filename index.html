@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0A3D62">
 <title>হিফয মাদরাসা ব্যবস্থাপনা</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 <script src="config.js"></script>
 <style>
 :root{--sea:#0A3D62;--sea2:#0F5A8F;--deep:#062A44;--aqua:#1FA3C4;--ink:#10212E;--mute:#56707F;--bg:#E9F1F7;--line:#CBDCE8;--field:#B3C7D6;--red:#B3392B;--ok:#1F7A5A;--tint:#EEF5FA}
@@ -652,10 +652,13 @@ function statusURL(s){
   if(!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0||!DB.settings.viewKey)return '';
   return CFG.API_URL+'?action=studentStatus&id='+encodeURIComponent(s.sid)+'&k='+encodeURIComponent(DB.settings.viewKey);
 }
-function qrDataURL(text,size){
-  if(typeof QRCode==='undefined')return '';
-  try{const div=document.createElement('div');new QRCode(div,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});
-    const c=div.querySelector('canvas');return c?c.toDataURL('image/png'):''}catch(e){return ''}
+function qrDataURL(text,targetPx){
+  if(typeof qrcode==='undefined')return '';
+  try{
+    const q=qrcode(0,'L');q.addData(text);q.make();
+    const cell=Math.max(3,Math.round((targetPx||160)/q.getModuleCount()));
+    return q.createDataURL(cell,4);
+  }catch(e){return ''}
 }
 function idCard(s){
   const st=DB.settings,wm=st.logo?`<img class="wm" src="${st.logo}" alt="">`:'',lg=st.logo?`<img src="${st.logo}" alt="">`:'';
@@ -916,7 +919,7 @@ function pSetup(){
    <div style="display:flex;gap:8px"><input id="p_vk" readonly value="${esc(s.viewKey||genKey())}"><button type="button" class="btn sm ghost" onclick="regenVK()">নতুন কোড তৈরি</button></div></div></div>
   <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
 }
-function genKey(){return uid()+uid()}
+function genKey(){return uid()+uid().slice(0,4)}
 async function regenVK(){if(!await ask('নতুন কোড তৈরি করলে আগের সব আইডি কার্ডের QR অকার্যকর হয়ে যাবে। নিশ্চিত?'))return;$('#p_vk').value=genKey()}
 async function saveSetup(){
   const ex=DB.settings;
