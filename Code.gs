@@ -36,8 +36,9 @@ function setup() {
 function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.i) {
-    return HtmlService.createHtmlOutput(studentStatusPage(p.i, p.k))
-      .setTitle('ফি হিসাব')
+    var html = p.type === 'staff' ? staffStatusPage(p.i, p.k) : studentStatusPage(p.i, p.k);
+    return HtmlService.createHtmlOutput(html)
+      .setTitle('হিসাব')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
   return ContentService.createTextOutput('মাদরাসা ব্যাকএন্ড চালু আছে');
@@ -281,7 +282,7 @@ function studentDues_(rules, collections, s, month) {
 function parseJSONArr_(x) { try { return x ? (typeof x === 'string' ? JSON.parse(x) : x) : []; } catch (e) { return []; } }
 
 /** id কার্ডের QR থেকে খোলা পাবলিক ফি-হিসাব পেজ। */
-function studentStatusPage(sid, key) {
+function statusShell_() {
   var css = 'body{font-family:"Noto Sans Bengali",system-ui,sans-serif;background:#E9F1F7;color:#10212E;margin:0;padding:16px;font-size:15px}' +
     '.card{max-width:480px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.12)}' +
     '.hd{background:#0A3D62;color:#fff;padding:16px;display:flex;align-items:center;gap:10px}' +
@@ -301,6 +302,11 @@ function studentStatusPage(sid, key) {
   var logo = files.logo || '';
   var headHTML = '<div class="hd">' + (logo ? '<img src="' + logo + '">' : '') +
     '<div><b>' + escH(st.name || 'প্রতিষ্ঠান') + '</b>' + (st.address ? '<small>' + escH(st.address) + '</small>' : '') + '</div></div>';
+  return { page: page, headHTML: headHTML, st: st };
+}
+
+function studentStatusPage(sid, key) {
+  var shell = statusShell_(), page = shell.page, headHTML = shell.headHTML, st = shell.st;
 
   if (!sid) return page(headHTML + '<div class="bd"><div class="warn">আইডি পাওয়া যায়নি</div></div>');
   if (!st.viewKey || key !== st.viewKey) return page(headHTML + '<div class="bd"><div class="warn">অবৈধ বা মেয়াদোত্তীর্ণ লিংক</div></div>');
@@ -322,6 +328,7 @@ function studentStatusPage(sid, key) {
     return '<tr><td>' + escH(h) + '</td><td class="n">' + tkH(x.acc) + '</td><td class="n">' + tkH(x.paid) + '</td><td class="n">' + tkH(rem) + '</td></tr>';
   }).join('');
 
+
   var info = '<table><tr><th>আইডি</th><td>' + bnD(s.sid) + '</td></tr>' +
     '<tr><th>নাম</th><td>' + escH(s.name) + '</td></tr>' +
     '<tr><th>বিভাগ</th><td>' + escH(s.dept) + ' (' + escH(s.type) + ')</td></tr>' +
@@ -335,6 +342,48 @@ function studentStatusPage(sid, key) {
 
   var updated = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy hh:mm a");
   var body = '<div class="bd">' + info + '<h3 style="color:#0A3D62;margin:14px 0 6px">' + fmonthH(cm) + ' পর্যন্ত হিসাব</h3>' + feeTable +
+    '<div class="upd">সর্বশেষ হালনাগাদ: ' + updated + '</div><div class="cr">@AM Shahed: 01605721296</div></div>';
+  return page(headHTML + body);
+}
+
+/** স্টাফ/শিক্ষকের আইডি কার্ডের QR থেকে খোলা পাবলিক বেতন-হিসাব পেজ। */
+function staffStatusPage(tid, key) {
+  var shell = statusShell_(), page = shell.page, headHTML = shell.headHTML, st = shell.st;
+
+  if (!tid) return page(headHTML + '<div class="bd"><div class="warn">আইডি পাওয়া যায়নি</div></div>');
+  if (!st.viewKey || key !== st.viewKey) return page(headHTML + '<div class="bd"><div class="warn">অবৈধ বা মেয়াদোত্তীর্ণ লিংক</div></div>');
+
+  var staffRows = readTable('staff');
+  var t = null;
+  for (var i = 0; i < staffRows.length; i++) { if (String(staffRows[i].tid) === String(tid)) { t = staffRows[i]; break; } }
+  if (!t) return page(headHTML + '<div class="bd"><div class="warn">এই আইডির কর্মী পাওয়া যায়নি</div></div>');
+
+  var salaries = readTable('salaries').filter(function (x) { return x.staffId === t.id; });
+  salaries.sort(function (a, b) { return String(b.month) < String(a.month) ? -1 : 1; });
+  var thisYear = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy');
+  var totalAll = 0, totalYear = 0;
+  salaries.forEach(function (x) {
+    var p = Number(x.paid) || 0;
+    totalAll += p;
+    if (String(x.month).slice(0, 4) === thisYear) totalYear += p;
+  });
+  var rows = salaries.slice(0, 12).map(function (x) {
+    return '<tr><td>' + fmonthH(x.month) + '</td><td>' + fdateH(x.date) + '</td><td class="n">' + tkH(x.paid) + '</td></tr>';
+  }).join('');
+
+  var info = '<table><tr><th>আইডি</th><td>' + bnD(t.tid) + '</td></tr>' +
+    '<tr><th>নাম</th><td>' + escH(t.name) + '</td></tr>' +
+    '<tr><th>পদবি</th><td>' + escH(t.desig) + '</td></tr>' +
+    '<tr><th>মাসিক বেতন</th><td>' + tkH(t.salary) + '</td></tr>' +
+    '<tr><th>যোগদানের তারিখ</th><td>' + fdateH(t.joinDate) + '</td></tr></table>';
+
+  var salTable = rows
+    ? '<table><tr><th>মাস</th><th>তারিখ</th><th class="n">প্রদত্ত</th></tr>' + rows + '</table>'
+    : '<p style="text-align:center;color:#56707F">কোনো বেতন প্রদানের রেকর্ড নেই</p>';
+
+  var updated = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy hh:mm a");
+  var body = '<div class="bd">' + info + '<h3 style="color:#0A3D62;margin:14px 0 6px">সাম্প্রতিক বেতন প্রদান</h3>' + salTable +
+    '<div class="upd">এই বছরে মোট প্রদত্ত: ' + tkH(totalYear) + ' &nbsp;|&nbsp; সর্বমোট প্রদত্ত: ' + tkH(totalAll) + '</div>' +
     '<div class="upd">সর্বশেষ হালনাগাদ: ' + updated + '</div><div class="cr">@AM Shahed: 01605721296</div></div>';
   return page(headHTML + body);
 }

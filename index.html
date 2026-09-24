@@ -182,7 +182,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 @media(max-width:720px){#foot .fw{grid-template-columns:1fr}#foot .fr{text-align:left}}
 .rcwrap{max-width:600px;margin:0 auto}
 .rcwrap .doc.rc{max-width:none}
-.rc .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1}
+.rc .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .rc .wmk.in img{width:55%;max-width:none}
 .rccredit{text-align:right;font-size:7px;color:#666;margin-top:3px}
 .sigrow.r{justify-content:flex-end}.sigrow.r .sgb{flex:none;width:170px}
@@ -213,16 +213,18 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 @page pgl{size:A4 landscape;margin:14mm 16mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
 #printArea.pgl{page:pgl}
 .cert{border:2.5px solid #0A3D62;border-radius:5px;padding:14mm 22mm;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box}
-.cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1}
-.cert .wmk.in img{width:38%;max-width:none;position:relative;top:50%;left:50%;transform:translate(-50%,-50%)}
+.cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
+.cert .wmk.in img{width:38%;max-width:none}
 .cert .lh{margin-bottom:10mm}
-.cert .ctitle{text-align:center;font-size:28px;font-weight:700;color:#0A3D62;text-decoration:underline;text-underline-offset:5px;margin-bottom:12mm}
+.cert .ctitle{text-align:center;font-size:28px;font-weight:700;color:#0A3D62;text-decoration:underline;text-underline-offset:5px;margin-bottom:6mm}
+.cert .cmeta{text-align:right;font-size:14px;color:#333;margin-bottom:8mm}
 .cert .cbody{font-size:16px;line-height:2.15;text-align:justify;flex:1}
 .cert .cbody b{color:#0A3D62}
-.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16mm;font-size:14px}
-.cert .csig{text-align:center;min-width:150px}
+.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16mm;font-size:14px;gap:20mm}
+.cert .csig{text-align:center;min-width:190px;flex:1;max-width:260px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
-.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:13px}
+.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:13px;white-space:nowrap}
+.cert .csig .sgname{font-size:12px;color:#333;white-space:nowrap;margin-top:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -404,10 +406,10 @@ function repData(from,to){
 const MENU=[
  {k:'dash',t:'ড্যাশবোর্ড'},
  {t:'শিক্ষার্থী',sub:[['stu','ভর্তি ফরম'],['fee','মাসিক ফি আদায়'],['idc','আইডি কার্ড']]},
- {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম']]},
+ {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম'],['sidc','আইডি কার্ড']]},
  {k:'rules',t:'ফি নির্ধারণ'},
  {k:'exp',t:'খরচ'},
- {t:'সার্টিফিকেট',sub:[['tp','প্রত্যয়নপত্র'],['ct','সার্টিফিকেট'],['cl','রেকর্ড']]},
+ {t:'সার্টিফিকেট',sub:[['tp','প্রত্যয়নপত্র'],['ct','সার্টিফিকেট']]},
  {t:'রিপোর্ট',sub:[['rm','মাসিক'],['ry','বাৎসরিক'],['rt','সর্বমোট']]},
  {t:'ব্যবস্থাপনা',sub:[['setup','প্রতিষ্ঠান সেটাপ'],['ntc','নোটিশ']]}
 ];
@@ -432,7 +434,7 @@ function render(){
   AFTER=null;const s=DB.settings;
   $('#brand').innerHTML=(s.logo?`<img src="${s.logo}" alt="">`:'')+esc(s.name||'হিফয মাদরাসা');
   const f=R.view==='form';
-  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,cl:clList,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
+  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,sidc:pStaffIdc,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
   $('#main').innerHTML=map[R.page]();
   if(AFTER)AFTER();drawMenu();$('#foot').innerHTML=siteFooter();
 }
@@ -662,14 +664,15 @@ function pIdc(){
 function idList(){const all=document.querySelector('input[name=idm]:checked').value==='all';if(all){const d=v('iddept');return DB.students.filter(s=>!d||s.dept===d)}const s=DB.students.find(x=>x.id===v('idst'));return s?[s]:[]}
 function idcFill(){const all=document.querySelector('input[name=idm]:checked').value==='all';$('#idone').style.display=all?'none':'';$('#idall').style.display=all?'':'none';const l=idList();$('#idprev').innerHTML=l.map(idCard).join('')||'<p class="empty" style="grid-column:1/-1">শিক্ষার্থী নির্বাচন করুন</p>'}
 function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`,{nowm:true,nofoot:true,nocredit:true})}
-function statusURL(s){
+function statusURL(s,type){
   if(!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0||!DB.settings.viewKey)return '';
   // /a/~/ forces Google to treat this as a plain "Anyone" web app link instead of
   // trying to match it to whichever of the visitor's logged-in Google accounts —
   // without this, phones signed into a Google account often get a
   // "Sorry, unable to open the file at present" error when opening the QR link.
   const base=CFG.API_URL.replace('https://script.google.com/macros/','https://script.google.com/a/~/macros/');
-  return base+'?i='+encodeURIComponent(s.sid)+'&k='+encodeURIComponent(DB.settings.viewKey);
+  const idVal=type==='staff'?s.tid:s.sid;
+  return base+'?i='+encodeURIComponent(idVal)+'&k='+encodeURIComponent(DB.settings.viewKey)+(type==='staff'?'&type=staff':'');
 }
 function qrDataURL(text,targetPx){
   if(typeof qrcode==='undefined')return '';
@@ -692,6 +695,33 @@ function idCard(s){
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
   <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
   <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে হিসাব দেখুন</div></div>`:''}</div>
+  <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
+}
+
+/* ================= staff: ID card ================= */
+function pStaffIdc(){
+  AFTER=stfIdcFill;
+  return `<div class="bar"><h1>আইডি কার্ড</h1><button class="btn" onclick="stfIdcPrint()">প্রিন্ট</button></div>
+  <div class="panel"><div class="seg"><label><input type="radio" name="sidm" value="one" checked onchange="stfIdcFill()"> নির্দিষ্ট কর্মী</label><label><input type="radio" name="sidm" value="all" onchange="stfIdcFill()"> সকল কর্মী</label></div>
+  <div class="grid"><label class="fld" id="sidone"><span>কর্মী</span><select id="sidst" onchange="stfIdcFill()"><option value="">— নির্বাচন করুন —</option>${DB.staff.map(t=>`<option value="${t.id}">${esc(t.name)} (${bn(t.tid)})</option>`).join('')}</select></label></div></div>
+  <div class="cards" id="sidprev"></div>`;
+}
+function stfIdList(){const all=document.querySelector('input[name=sidm]:checked').value==='all';if(all)return DB.staff;const t=DB.staff.find(x=>x.id===v('sidst'));return t?[t]:[]}
+function stfIdcFill(){const all=document.querySelector('input[name=sidm]:checked').value==='all';$('#sidone').style.display=all?'none':'';const l=stfIdList();$('#sidprev').innerHTML=l.map(staffIdCard).join('')||'<p class="empty" style="grid-column:1/-1">কর্মী নির্বাচন করুন</p>'}
+function stfIdcPrint(){const l=stfIdList();if(!l.length)return toast('কোনো কর্মী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(staffIdCard).join('')}</div>`,{nowm:true,nocredit:true})}
+function staffIdCard(t){
+  const st=DB.settings,wm=st.logo?`<img class="wm" src="${st.logo}" alt="">`:'',lg=st.logo?`<img src="${st.logo}" alt="">`:'';
+  const head=`<div class="ih">${lg}<div class="it"><b>${esc(st.name||'প্রতিষ্ঠানের নাম')}</b>${st.address?`<small>${esc(st.address)}</small>`:''}</div></div>`;
+  const row=(k,val)=>`<tr><td class="k">${k}</td><td class="c">:</td><td class="v">${val}</td></tr>`;
+  const url=statusURL(t,'staff'),qr=url?qrDataURL(url,160):'';
+  const same=!t.pres||t.pres===t.perm;
+  const addr=same?(t.perm||t.pres?row('ঠিকানা',esc(t.perm||t.pres)):''):row('স্থায়ী',esc(t.perm))+row('বর্তমান',esc(t.pres));
+  return `<div class="pair"><div class="idc">${wm}${head}
+  <div class="ib"><div class="ph">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(t.name)}</div>
+  <table class="kvc">${row('আইডি',bn(t.tid))}${row('পদবি',esc(t.desig))}${row('মোবাইল',bn(t.mobile))}</table></div>
+  <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
+  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
+  <div class="idc">${wm}${head}<div class="bd"><div class="bh">ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে বেতনের হিসাব দেখুন</div></div>`:''}</div>
   <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
 }
 
@@ -899,6 +929,9 @@ function printExp(id){
 }
 
 /* ================= certificates ================= */
+const CERTOPEN={};
+function toggleCertForm(prefix){CERTOPEN[prefix]=!CERTOPEN[prefix];render()}
+function certLeftInfo(type){return type==='tp'?['লেখকের স্বাক্ষর',null]:['প্রধান শিক্ষকের স্বাক্ষর (হাফেজ)',DB.settings.headTeacher]}
 function filterCertSel(qid,selid){const cur=v(selid);$('#'+selid).innerHTML=stOpts(cur,en($('#'+qid).value.toLowerCase()))}
 function fillCertFields(prefix,withDept){
   const s=DB.students.find(x=>x.id===v(prefix+'_st'));
@@ -909,9 +942,8 @@ function fillCertFields(prefix,withDept){
   $('#'+prefix+'_addr').value=s?(s.permAddr||''):'';
   if(withDept)$('#'+prefix+'_dept').value=s?(s.dept||''):'';
 }
-function certForm(prefix,title,withDept,extraLabel){
-  return `<div class="bar"><h1>${title}</h1></div>
-  <div class="panel"><div class="grid">
+function certFormHTML(prefix,withDept,extraLabel){
+  return `<div class="panel"><div class="grid">
    <label class="fld"><span>শিক্ষার্থী খুঁজুন</span><input id="${prefix}_q" placeholder="নাম বা আইডি" oninput="filterCertSel('${prefix}_q','${prefix}_st')"></label>
    <label class="fld"><span>শিক্ষার্থী (সিলেক্ট)</span><select id="${prefix}_st" onchange="fillCertFields('${prefix}',${withDept})">${stOpts('')}</select></label>
    ${fld(prefix+'_date','তারিখ',today(),'date')}
@@ -925,15 +957,31 @@ function certForm(prefix,title,withDept,extraLabel){
    ${area(prefix+'_addr','স্থায়ী ঠিকানা','','full')}
   </div>
   ${area(prefix+'_note',extraLabel,'','full')}
-  <p class="note">প্রিন্টের আগে পরিচালকের মৌখিক অনুমোদন চাওয়া হবে; স্বাক্ষরের ঘর কাগজে সরাসরি স্বাক্ষরের জন্য ফাঁকা থাকবে। প্রিন্ট করলেই এটি "রেকর্ড" তালিকায় সংরক্ষিত হবে।</p>
+  <p class="note">প্রিন্টের আগে পরিচালকের মৌখিক অনুমোদন চাওয়া হবে; স্বাক্ষরের ঘর কাগজে সরাসরি স্বাক্ষরের জন্য ফাঁকা থাকবে। প্রিন্ট করলেই এটি নিচের তালিকায় সংরক্ষিত হবে।</p>
   <div class="row"><button class="btn" onclick="print${prefix==='tp'?'CertLetter':'Certificate'}()">প্রিন্ট (A4 Landscape)</button></div></div>`;
 }
-function pCertLetter(){return certForm('tp','প্রত্যয়নপত্র',false,'অতিরিক্ত বিবরণ (ঐচ্ছিক)')}
-function pCertificate(){return certForm('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
-function certDoc(title,bodyHTML,date){
-  const s=DB.settings;
-  return `<div class="cert">${wmIn()}${lh()}<div class="ctitle">${title}</div><div class="cbody">${bodyHTML}</div>
-  <div class="cfoot"><div>তারিখ: ${fdate(date)}</div><div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">পরিচালকের স্বাক্ষর${s.director?'<br>'+esc(s.director):''}</div></div></div></div>`;
+function certPage(prefix,title,withDept,extraLabel){
+  const open=!!CERTOPEN[prefix];
+  return `<div class="bar"><h1>${title}</h1><button class="btn" onclick="toggleCertForm('${prefix}')">${open?'ফরম বন্ধ করুন':'+ নতুন '+title}</button></div>
+  ${open?certFormHTML(prefix,withDept,extraLabel):''}
+  <div class="panel"><div class="sec" style="margin:0 0 10px">ইস্যুকৃত তালিকা</div>
+  <div class="filters" style="grid-template-columns:1fr"><input id="${prefix}_lq" placeholder="নাম বা আইডি দিয়ে খুঁজুন" oninput="fillCertList('${prefix}')"></div>
+  <p class="cnt" id="${prefix}_cnt"></p>
+  <div class="tw"><table class="tbl"><thead><tr><th>তারিখ</th><th>নাম</th><th>আইডি</th>${withDept?'<th>বিভাগ</th>':''}<th></th></tr></thead><tbody id="${prefix}_tb"></tbody></table></div></div>`;
+}
+function fillCertList(prefix){
+  const q=en(($('#'+prefix+'_lq')?$('#'+prefix+'_lq').value:'').toLowerCase());
+  const rows=DB.certificates.filter(c=>c.type===prefix&&(!q||(c.name+' '+c.sid).toLowerCase().includes(q))).sort((a,b)=>b.ts-a.ts);
+  $('#'+prefix+'_cnt').textContent='মোট '+bn(rows.length)+' টি';
+  $('#'+prefix+'_tb').innerHTML=rows.map(c=>`<tr><td>${fdate(c.date)}</td><td>${esc(c.name)}</td><td>${bn(c.sid)}</td>${prefix==='ct'?`<td>${esc(c.dept||'')}</td>`:''}<td><div class="acts"><button class="btn sm ghost" onclick="reprintCert('${c.id}')">আবার প্রিন্ট</button><button class="btn sm danger" onclick="delCert('${c.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="${prefix==='ct'?5:4}" class="empty">কোনো রেকর্ড নেই</td></tr>`;
+}
+function pCertLetter(){AFTER=()=>fillCertList('tp');return certPage('tp','প্রত্যয়নপত্র',false,'অতিরিক্ত বিবরণ (ঐচ্ছিক)')}
+function pCertificate(){AFTER=()=>fillCertList('ct');return certPage('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
+function certDoc(type,title,bodyHTML,date){
+  const s=DB.settings,[leftLabel,leftName]=certLeftInfo(type);
+  const sig=(label,name)=>`<div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">${label}</div>${name?`<div class="sgname">${esc(name)}</div>`:''}</div>`;
+  return `<div class="cert">${wmIn()}${lh()}<div class="ctitle">${title}</div><div class="cmeta">তারিখ: ${fdate(date)}</div><div class="cbody">${bodyHTML}</div>
+  <div class="cfoot">${sig(leftLabel,leftName)}${sig('পরিচালকের স্বাক্ষর',s.director)}</div></div>`;
 }
 function tpBody(name,father,mother,addr,sid,note){
   return `এই মর্মে প্রত্যয়ন করা যাচ্ছে যে, <b>${esc(name)}</b>, পিতা: ${esc(father)}, মাতা: ${esc(mother)}, সাং: ${esc(addr)}, আইডি নং: ${esc(sid)} — উক্ত শিক্ষার্থী আমাদের প্রতিষ্ঠানের একজন নিয়মিত শিক্ষার্থী। তার নৈতিক চরিত্র ও আচার-আচরণ সন্তোষজনক বলে প্রত্যয়ন করা হলো। আমি তার সর্বাঙ্গীণ মঙ্গল ও উজ্জ্বল ভবিষ্যৎ কামনা করছি।${note?'<br><br>'+esc(note):''}`;
@@ -949,8 +997,8 @@ async function printCertLetter(){
   const rec={id:uid(),type:'tp',studentId:s.id,sid:s.sid,name,father,mother,addr,date,note,ts:Date.now()};
   if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
   DB.certificates.push(rec);
-  printHTML(certDoc('প্রত্যয়নপত্র',tpBody(name,father,mother,addr,sid,note),date),{landscape:true,nowm:true});
-  toast('রেকর্ড সংরক্ষিত');
+  printHTML(certDoc('tp','প্রত্যয়নপত্র',tpBody(name,father,mother,addr,sid,note),date),{landscape:true,nowm:true});
+  toast('রেকর্ড সংরক্ষিত');render();
 }
 async function printCertificate(){
   const s=DB.students.find(x=>x.id===v('ct_st'));if(!s)return toast('শিক্ষার্থী নির্বাচন করুন');
@@ -960,25 +1008,13 @@ async function printCertificate(){
   const rec={id:uid(),type:'ct',studentId:s.id,sid:s.sid,name,father,mother,addr,dept,date,note,ts:Date.now()};
   if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
   DB.certificates.push(rec);
-  printHTML(certDoc('সার্টিফিকেট',ctBody(name,father,mother,addr,sid,dept,note),date),{landscape:true,nowm:true});
-  toast('রেকর্ড সংরক্ষিত');
-}
-function clList(){
-  AFTER=fillCl;
-  return `<div class="bar"><h1>সার্টিফিকেট রেকর্ড</h1></div>
-  <div class="panel"><div class="filters" style="grid-template-columns:2fr 1fr"><input id="q" placeholder="নাম বা আইডি দিয়ে খুঁজুন" oninput="fillCl()"><select id="ft" onchange="fillCl()"><option value="">সকল ধরন</option><option value="tp">প্রত্যয়নপত্র</option><option value="ct">সার্টিফিকেট</option></select></div>
-  <p class="cnt" id="cnt"></p><div class="tw"><table class="tbl"><thead><tr><th>তারিখ</th><th>ধরন</th><th>নাম</th><th>আইডি</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
-}
-function fillCl(){
-  const q=en(v('q').toLowerCase()),ft=v('ft');
-  const rows=DB.certificates.filter(c=>(!ft||c.type===ft)&&(!q||(c.name+' '+c.sid).toLowerCase().includes(q))).sort((a,b)=>b.ts-a.ts);
-  $('#cnt').textContent='মোট '+bn(rows.length)+' টি';
-  $('#tb').innerHTML=rows.map(c=>`<tr><td>${fdate(c.date)}</td><td>${c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট'}</td><td>${esc(c.name)}</td><td>${bn(c.sid)}</td><td><div class="acts"><button class="btn sm ghost" onclick="reprintCert('${c.id}')">আবার প্রিন্ট</button><button class="btn sm danger" onclick="delCert('${c.id}')">মুছুন</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">কোনো রেকর্ড নেই</td></tr>';
+  printHTML(certDoc('ct','সার্টিফিকেট',ctBody(name,father,mother,addr,sid,dept,note),date),{landscape:true,nowm:true});
+  toast('রেকর্ড সংরক্ষিত');render();
 }
 function reprintCert(id){
   const c=DB.certificates.find(x=>x.id===id);if(!c)return;
   const body=c.type==='tp'?tpBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.note):ctBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.dept,c.note);
-  printHTML(certDoc(c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট',body,c.date),{landscape:true,nowm:true});
+  printHTML(certDoc(c.type,c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট',body,c.date),{landscape:true,nowm:true});
 }
 async function delCert(id){if(!await ask('এই রেকর্ডটি মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'certificates',id}])))return;DB.certificates=DB.certificates.filter(x=>x.id!==id);render();toast('মুছে ফেলা হয়েছে')}
 
