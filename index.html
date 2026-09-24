@@ -210,6 +210,19 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 }
 @page pgc{size:A4;margin:10mm 12mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
 #printArea.pgc{page:pgc}
+@page pgl{size:A4 landscape;margin:14mm 16mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
+#printArea.pgl{page:pgl}
+.cert{border:2.5px solid #0A3D62;border-radius:5px;padding:14mm 22mm;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box}
+.cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1}
+.cert .wmk.in img{width:38%;max-width:none;position:relative;top:50%;left:50%;transform:translate(-50%,-50%)}
+.cert .lh{margin-bottom:10mm}
+.cert .ctitle{text-align:center;font-size:28px;font-weight:700;color:#0A3D62;text-decoration:underline;text-underline-offset:5px;margin-bottom:12mm}
+.cert .cbody{font-size:16px;line-height:2.15;text-align:justify;flex:1}
+.cert .cbody b{color:#0A3D62}
+.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16mm;font-size:14px}
+.cert .csig{text-align:center;min-width:150px}
+.cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
+.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:13px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -266,10 +279,10 @@ const busy=on=>$('#busy').classList.toggle('show',!!on);
 const setStat=t=>{const e=$('#stat');if(e)e.textContent=t};
 
 /* ================= data + Google Sheet API ================= */
-const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
+const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
 let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
-const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created']);
+const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created','ts']);
 const BOOLF=new Set(['pledge','approved']);
 const JSONF=new Set(['lines','history','seq','items']);
 function norm(rec){for(const k in rec){const x=rec[k];
@@ -299,7 +312,7 @@ async function reload(){
   busy(true);setStat('লোড হচ্ছে…');
   try{
     const d=await api('list');
-    ['students','collections','feeRules','staff','salaries','expenses','notices'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
+    ['students','collections','feeRules','staff','salaries','expenses','notices','certificates'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
     const st=norm(d.settings||{});const sq=st.seq||{};delete st.seq;delete st.id;
     DB.settings=Object.assign(defDB().settings,st);
     if(!DB.settings.pledge)DB.settings.pledge=PLEDGE;if(!DB.settings.approval)DB.settings.approval=APPROVAL;
@@ -343,7 +356,7 @@ const boxed=h=>'<div class="rcwrap">'+h.replace('<div class="doc rc">','<div cla
 const printBox=h=>printHTML(boxed(h),{nowm:true,nocredit:true});
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
 function printHTML(h,o){o=o||{};
-  $('#printArea').className=o.nocredit?'':'pgc';
+  $('#printArea').className=o.nocredit?'':(o.landscape?'pgl':'pgc');
   $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h;
   setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
@@ -394,6 +407,7 @@ const MENU=[
  {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম']]},
  {k:'rules',t:'ফি নির্ধারণ'},
  {k:'exp',t:'খরচ'},
+ {t:'সার্টিফিকেট',sub:[['tp','প্রত্যয়নপত্র'],['ct','সার্টিফিকেট'],['cl','রেকর্ড']]},
  {t:'রিপোর্ট',sub:[['rm','মাসিক'],['ry','বাৎসরিক'],['rt','সর্বমোট']]},
  {t:'ব্যবস্থাপনা',sub:[['setup','প্রতিষ্ঠান সেটাপ'],['ntc','নোটিশ']]}
 ];
@@ -418,7 +432,7 @@ function render(){
   AFTER=null;const s=DB.settings;
   $('#brand').innerHTML=(s.logo?`<img src="${s.logo}" alt="">`:'')+esc(s.name||'হিফয মাদরাসা');
   const f=R.view==='form';
-  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
+  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,cl:clList,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
   $('#main').innerHTML=map[R.page]();
   if(AFTER)AFTER();drawMenu();$('#foot').innerHTML=siteFooter();
 }
@@ -650,7 +664,12 @@ function idcFill(){const all=document.querySelector('input[name=idm]:checked').v
 function idcPrint(){const l=idList();if(!l.length)return toast('কোনো শিক্ষার্থী নির্বাচিত নেই');printHTML(`<div class="cards">${l.map(idCard).join('')}</div>`,{nowm:true,nofoot:true,nocredit:true})}
 function statusURL(s){
   if(!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0||!DB.settings.viewKey)return '';
-  return CFG.API_URL+'?action=studentStatus&id='+encodeURIComponent(s.sid)+'&k='+encodeURIComponent(DB.settings.viewKey);
+  // /a/~/ forces Google to treat this as a plain "Anyone" web app link instead of
+  // trying to match it to whichever of the visitor's logged-in Google accounts —
+  // without this, phones signed into a Google account often get a
+  // "Sorry, unable to open the file at present" error when opening the QR link.
+  const base=CFG.API_URL.replace('https://script.google.com/macros/','https://script.google.com/a/~/macros/');
+  return base+'?i='+encodeURIComponent(s.sid)+'&k='+encodeURIComponent(DB.settings.viewKey);
 }
 function qrDataURL(text,targetPx){
   if(typeof qrcode==='undefined')return '';
@@ -879,6 +898,90 @@ function printExp(id){
   <div class="sigrow">${sg('','গ্রহীতা')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
 
+/* ================= certificates ================= */
+function filterCertSel(qid,selid){const cur=v(selid);$('#'+selid).innerHTML=stOpts(cur,en($('#'+qid).value.toLowerCase()))}
+function fillCertFields(prefix,withDept){
+  const s=DB.students.find(x=>x.id===v(prefix+'_st'));
+  $('#'+prefix+'_id').value=s?bn(s.sid):'';
+  $('#'+prefix+'_name').value=s?(s.name||''):'';
+  $('#'+prefix+'_father').value=s?(s.fName||''):'';
+  $('#'+prefix+'_mother').value=s?(s.mName||''):'';
+  $('#'+prefix+'_addr').value=s?(s.permAddr||''):'';
+  if(withDept)$('#'+prefix+'_dept').value=s?(s.dept||''):'';
+}
+function certForm(prefix,title,withDept,extraLabel){
+  return `<div class="bar"><h1>${title}</h1></div>
+  <div class="panel"><div class="grid">
+   <label class="fld"><span>শিক্ষার্থী খুঁজুন</span><input id="${prefix}_q" placeholder="নাম বা আইডি" oninput="filterCertSel('${prefix}_q','${prefix}_st')"></label>
+   <label class="fld"><span>শিক্ষার্থী (সিলেক্ট)</span><select id="${prefix}_st" onchange="fillCertFields('${prefix}',${withDept})">${stOpts('')}</select></label>
+   ${fld(prefix+'_date','তারিখ',today(),'date')}
+  </div>
+  <div class="sec" style="margin-top:18px">তথ্য (স্বয়ংক্রিয়ভাবে বসবে)</div><div class="grid">
+   ${withDept?fld(prefix+'_dept','বিভাগ','','text','readonly'):''}
+   ${fld(prefix+'_id','আইডি নং','','text','readonly')}
+   ${fld(prefix+'_name','নাম','','text','readonly')}
+   ${fld(prefix+'_father','পিতার নাম','','text','readonly')}
+   ${fld(prefix+'_mother','মাতার নাম','','text','readonly')}
+   ${area(prefix+'_addr','স্থায়ী ঠিকানা','','full')}
+  </div>
+  ${area(prefix+'_note',extraLabel,'','full')}
+  <p class="note">প্রিন্টের আগে পরিচালকের মৌখিক অনুমোদন চাওয়া হবে; স্বাক্ষরের ঘর কাগজে সরাসরি স্বাক্ষরের জন্য ফাঁকা থাকবে। প্রিন্ট করলেই এটি "রেকর্ড" তালিকায় সংরক্ষিত হবে।</p>
+  <div class="row"><button class="btn" onclick="print${prefix==='tp'?'CertLetter':'Certificate'}()">প্রিন্ট (A4 Landscape)</button></div></div>`;
+}
+function pCertLetter(){return certForm('tp','প্রত্যয়নপত্র',false,'অতিরিক্ত বিবরণ (ঐচ্ছিক)')}
+function pCertificate(){return certForm('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
+function certDoc(title,bodyHTML,date){
+  const s=DB.settings;
+  return `<div class="cert">${wmIn()}${lh()}<div class="ctitle">${title}</div><div class="cbody">${bodyHTML}</div>
+  <div class="cfoot"><div>তারিখ: ${fdate(date)}</div><div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">পরিচালকের স্বাক্ষর${s.director?'<br>'+esc(s.director):''}</div></div></div></div>`;
+}
+function tpBody(name,father,mother,addr,sid,note){
+  return `এই মর্মে প্রত্যয়ন করা যাচ্ছে যে, <b>${esc(name)}</b>, পিতা: ${esc(father)}, মাতা: ${esc(mother)}, সাং: ${esc(addr)}, আইডি নং: ${esc(sid)} — উক্ত শিক্ষার্থী আমাদের প্রতিষ্ঠানের একজন নিয়মিত শিক্ষার্থী। তার নৈতিক চরিত্র ও আচার-আচরণ সন্তোষজনক বলে প্রত্যয়ন করা হলো। আমি তার সর্বাঙ্গীণ মঙ্গল ও উজ্জ্বল ভবিষ্যৎ কামনা করছি।${note?'<br><br>'+esc(note):''}`;
+}
+function ctBody(name,father,mother,addr,sid,dept,note){
+  return `এই মর্মে সনদপত্র প্রদান করা যাচ্ছে যে, <b>${esc(name)}</b>, পিতা: ${esc(father)}, মাতা: ${esc(mother)}, সাং: ${esc(addr)}, আইডি নং: ${esc(sid)} — উক্ত শিক্ষার্থী আমাদের প্রতিষ্ঠানের <b>${esc(dept)}</b> বিভাগের নির্ধারিত পড়াশোনা সাফল্যের সাথে সম্পন্ন করেছে। তার উজ্জ্বল ভবিষ্যৎ কামনা করছি।${note?'<br><br>'+esc(note):''}`;
+}
+async function printCertLetter(){
+  const s=DB.students.find(x=>x.id===v('tp_st'));if(!s)return toast('শিক্ষার্থী নির্বাচন করুন');
+  if(!await ask('পরিচালক কি এই প্রত্যয়নপত্র ইস্যু করতে অনুমোদন দিয়েছেন?'))return;
+  const date=v('tp_date')||today(),note=$('#tp_note').value.trim();
+  const name=$('#tp_name').value||s.name,father=$('#tp_father').value||s.fName||'',mother=$('#tp_mother').value||s.mName||'',addr=$('#tp_addr').value||s.permAddr||'',sid=$('#tp_id').value||bn(s.sid);
+  const rec={id:uid(),type:'tp',studentId:s.id,sid:s.sid,name,father,mother,addr,date,note,ts:Date.now()};
+  if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
+  DB.certificates.push(rec);
+  printHTML(certDoc('প্রত্যয়নপত্র',tpBody(name,father,mother,addr,sid,note),date),{landscape:true,nowm:true});
+  toast('রেকর্ড সংরক্ষিত');
+}
+async function printCertificate(){
+  const s=DB.students.find(x=>x.id===v('ct_st'));if(!s)return toast('শিক্ষার্থী নির্বাচন করুন');
+  if(!await ask('পরিচালক কি এই সার্টিফিকেট ইস্যু করতে অনুমোদন দিয়েছেন?'))return;
+  const date=v('ct_date')||today(),note=$('#ct_note').value.trim();
+  const name=$('#ct_name').value||s.name,father=$('#ct_father').value||s.fName||'',mother=$('#ct_mother').value||s.mName||'',addr=$('#ct_addr').value||s.permAddr||'',sid=$('#ct_id').value||bn(s.sid),dept=$('#ct_dept').value||s.dept||'';
+  const rec={id:uid(),type:'ct',studentId:s.id,sid:s.sid,name,father,mother,addr,dept,date,note,ts:Date.now()};
+  if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
+  DB.certificates.push(rec);
+  printHTML(certDoc('সার্টিফিকেট',ctBody(name,father,mother,addr,sid,dept,note),date),{landscape:true,nowm:true});
+  toast('রেকর্ড সংরক্ষিত');
+}
+function clList(){
+  AFTER=fillCl;
+  return `<div class="bar"><h1>সার্টিফিকেট রেকর্ড</h1></div>
+  <div class="panel"><div class="filters" style="grid-template-columns:2fr 1fr"><input id="q" placeholder="নাম বা আইডি দিয়ে খুঁজুন" oninput="fillCl()"><select id="ft" onchange="fillCl()"><option value="">সকল ধরন</option><option value="tp">প্রত্যয়নপত্র</option><option value="ct">সার্টিফিকেট</option></select></div>
+  <p class="cnt" id="cnt"></p><div class="tw"><table class="tbl"><thead><tr><th>তারিখ</th><th>ধরন</th><th>নাম</th><th>আইডি</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
+}
+function fillCl(){
+  const q=en(v('q').toLowerCase()),ft=v('ft');
+  const rows=DB.certificates.filter(c=>(!ft||c.type===ft)&&(!q||(c.name+' '+c.sid).toLowerCase().includes(q))).sort((a,b)=>b.ts-a.ts);
+  $('#cnt').textContent='মোট '+bn(rows.length)+' টি';
+  $('#tb').innerHTML=rows.map(c=>`<tr><td>${fdate(c.date)}</td><td>${c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট'}</td><td>${esc(c.name)}</td><td>${bn(c.sid)}</td><td><div class="acts"><button class="btn sm ghost" onclick="reprintCert('${c.id}')">আবার প্রিন্ট</button><button class="btn sm danger" onclick="delCert('${c.id}')">মুছুন</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">কোনো রেকর্ড নেই</td></tr>';
+}
+function reprintCert(id){
+  const c=DB.certificates.find(x=>x.id===id);if(!c)return;
+  const body=c.type==='tp'?tpBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.note):ctBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.dept,c.note);
+  printHTML(certDoc(c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট',body,c.date),{landscape:true,nowm:true});
+}
+async function delCert(id){if(!await ask('এই রেকর্ডটি মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'certificates',id}])))return;DB.certificates=DB.certificates.filter(x=>x.id!==id);render();toast('মুছে ফেলা হয়েছে')}
+
 /* ================= reports ================= */
 const RP={m:ym(),y:new Date().getFullYear()};
 function pRep(kind){
@@ -917,10 +1020,19 @@ function pSetup(){
   <div class="sec">আইডি কার্ড QR — যাচাই কোড</div>
   <div class="grid"><div class="fld full"><span>এই কোড আইডি কার্ডের QR-এ বসে; পরিবর্তন করলে আগের সব ছাপানো কার্ডের QR অকার্যকর হয়ে যাবে</span>
    <div style="display:flex;gap:8px"><input id="p_vk" readonly value="${esc(s.viewKey||genKey())}"><button type="button" class="btn sm ghost" onclick="regenVK()">নতুন কোড তৈরি</button></div></div></div>
+  <div class="row"><button type="button" class="btn sm ghost" onclick="testStatusLink()">QR লিংক টেস্ট করুন</button></div>
+  <p class="note">প্রথমে সংরক্ষণ করুন, তারপর এই বাটনে চাপুন — এটি প্রথম শিক্ষার্থীর হিসাব-পেজ কম্পিউটার/ফোনের ব্রাউজারে সরাসরি খুলে দেখাবে। এখানে হিসাব দেখা গেলে ধরে নেবেন ব্যাকএন্ড ঠিক আছে; QR স্ক্যানে সমস্যা হলে সেটা তখন স্ক্যানারের সমস্যা।</p>
   <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
 }
 function genKey(){return uid()+uid().slice(0,4)}
 async function regenVK(){if(!await ask('নতুন কোড তৈরি করলে আগের সব আইডি কার্ডের QR অকার্যকর হয়ে যাবে। নিশ্চিত?'))return;$('#p_vk').value=genKey()}
+function testStatusLink(){
+  if(!DB.students.length)return toast('আগে অন্তত একজন শিক্ষার্থী ভর্তি করুন');
+  if(!DB.settings.viewKey)return toast('আগে সংরক্ষণ করুন, যাতে যাচাই কোড সক্রিয় হয়');
+  const url=statusURL(DB.students[0]);
+  if(!url)return toast('লিংক তৈরি করা যায়নি — config.js-এ API_URL ঠিক আছে কিনা দেখুন');
+  window.open(url,'_blank');
+}
 async function saveSetup(){
   const ex=DB.settings;
   const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,viewKey:v('p_vk')||genKey()};

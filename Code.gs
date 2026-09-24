@@ -16,6 +16,7 @@ const NAMES = {
   salaries: 'Salaries',
   expenses: 'Expenses',
   notices: 'Notices',
+  certificates: 'Certificates',
   settings: 'Settings'
 };
 // বড় ছবি/স্বাক্ষর যেসব ঘরে থাকে সেগুলো আলাদা "Files" ট্যাবে টুকরো করে রাখা হয়
@@ -34,8 +35,8 @@ function setup() {
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
-  if (p.action === 'studentStatus') {
-    return HtmlService.createHtmlOutput(studentStatusPage(p.id, p.k))
+  if (p.i) {
+    return HtmlService.createHtmlOutput(studentStatusPage(p.i, p.k))
       .setTitle('ফি হিসাব')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
