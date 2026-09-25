@@ -21,7 +21,7 @@ const NAMES = {
 };
 // বড় ছবি/স্বাক্ষর যেসব ঘরে থাকে সেগুলো আলাদা "Files" ট্যাবে টুকরো করে রাখা হয়
 const HEAVY = ['sigStu', 'sigGua', 'sigHead', 'sigDir', 'birthCert', 'fNid', 'mNid',
-               'sig', 'dirSig', 'sigCash', 'sigRec', 'directorSig'];
+               'sig', 'dirSig', 'sigCash', 'sigRec', 'directorSig', 'certBg'];
 const CHUNK = 40000; // Google Sheet-এর এক ঘরে সর্বোচ্চ ৫০,০০০ অক্ষর
 
 function SS() { return SpreadsheetApp.getActiveSpreadsheet(); }

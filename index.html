@@ -206,7 +206,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
  @page{size:A4;margin:10mm 12mm}
  .cards{zoom:1;gap:4mm}
  .pair{margin:0 auto 4mm}
- .idc,.kv th,.lh,.dphoto,.idc .ih,.idc .if,.wmk img{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .idc,.kv th,.lh,.dphoto,.idc .ih,.idc .if,.wmk img,.cert{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 @page pgc{size:A4;margin:10mm 12mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
 #printArea.pgc{page:pgc}
@@ -214,19 +214,21 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea.pgl{page:pgl}
 @page pgln{size:A4 landscape;margin:15mm}
 #printArea.pgln{page:pgln}
-.cert{border:3px solid #0A3D62;outline:1.5px solid #0A3D62;outline-offset:7px;border-radius:3px;padding:18mm;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;margin:8px}
+.cert{padding:14mm 20mm;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
-.cert .lh{margin-bottom:10mm}
-.cert .ctitle{text-align:center;font-size:28px;font-weight:700;color:#0A3D62;text-decoration:underline;text-underline-offset:5px;margin-bottom:6mm}
-.cert .cmeta{text-align:right;font-size:16px;color:#333;margin-bottom:8mm}
-.cert .cbody{font-size:16px;line-height:2.15;text-align:justify;flex:1}
-.cert .cbody b{color:#0A3D62}
-.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16mm;font-size:16px;gap:20mm}
-.cert .csig{text-align:center;min-width:190px;flex:1;max-width:260px}
+.cert .lh{margin-bottom:6mm}
+.cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:5mm}
+.cert .chead .csp{flex:1}
+.cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:700;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
+.cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
+.cert .cbody{font-size:16px;line-height:2.1;text-align:justify;flex:1;color:#000}
+.cert .cbody b{font-weight:700}
+.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14mm;font-size:16px;gap:10mm}
+.cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
-.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:16px;white-space:nowrap}
-.cert .csig .sgname{font-size:15px;color:#333;white-space:nowrap;margin-top:2px}
+.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:16px;white-space:nowrap;color:#000}
+.cert .csig .sgname{font-size:15px;color:#000;font-weight:700;white-space:nowrap;margin-top:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -934,7 +936,6 @@ function printExp(id){
 /* ================= certificates ================= */
 const CERTOPEN={};
 function toggleCertForm(prefix){CERTOPEN[prefix]=!CERTOPEN[prefix];render()}
-function certLeftInfo(type){return type==='tp'?['লেখকের স্বাক্ষর',null]:['প্রধান শিক্ষকের স্বাক্ষর (হাফেজ)',DB.settings.headTeacher]}
 function filterCertSel(qid,selid){const cur=v(selid);$('#'+selid).innerHTML=stOpts(cur,en($('#'+qid).value.toLowerCase()))}
 function fillCertFields(prefix,withDept){
   const s=DB.students.find(x=>x.id===v(prefix+'_st'));
@@ -981,10 +982,11 @@ function fillCertList(prefix){
 function pCertLetter(){AFTER=()=>fillCertList('tp');return certPage('tp','প্রত্যয়নপত্র',false,'অতিরিক্ত বিবরণ (ঐচ্ছিক)')}
 function pCertificate(){AFTER=()=>fillCertList('ct');return certPage('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
 function certDoc(type,title,bodyHTML,date){
-  const s=DB.settings,[leftLabel,leftName]=certLeftInfo(type);
+  const s=DB.settings;
   const sig=(label,name)=>`<div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">${label}</div>${name?`<div class="sgname">${esc(name)}</div>`:''}</div>`;
-  return `<div class="cert">${wmIn()}${lh()}<div class="ctitle">${title}</div><div class="cmeta">তারিখ: ${fdate(date)}</div><div class="cbody">${bodyHTML}</div>
-  <div class="cfoot">${sig(leftLabel,leftName)}${sig('পরিচালকের স্বাক্ষর',s.director)}</div></div>`;
+  const bgStyle=s.certBg?` style="background-image:url('${s.certBg}')"`:'';
+  return `<div class="cert"${bgStyle}>${wmIn()}${lh()}<div class="chead"><span class="csp"></span><div class="ctitle">${title}</div><div class="cmeta">তারিখ: ${fdate(date)}</div></div><div class="cbody">${bodyHTML}</div>
+  <div class="cfoot">${sig('প্রধান শিক্ষকের স্বাক্ষর (হিফয)',s.headTeacher)}${sig('পরিচালকের স্বাক্ষর',s.director)}${sig('লেখকের স্বাক্ষর',null)}</div></div>`;
 }
 function tpBody(name,father,mother,addr,sid,note){
   return `এই মর্মে প্রত্যয়ন করা যাচ্ছে যে, <b>${esc(name)}</b>, পিতা: ${esc(father)}, মাতা: ${esc(mother)}, সাং: ${esc(addr)}, আইডি নং: ${esc(sid)} — উক্ত শিক্ষার্থী আমাদের প্রতিষ্ঠানের একজন নিয়মিত শিক্ষার্থী। তার নৈতিক চরিত্র ও আচার-আচরণ সন্তোষজনক বলে প্রত্যয়ন করা হলো। আমি তার সর্বাঙ্গীণ মঙ্গল ও উজ্জ্বল ভবিষ্যৎ কামনা করছি।${note?'<br><br>'+esc(note):''}`;
@@ -1056,25 +1058,15 @@ function pSetup(){
    ${area('p_pl','অঙ্গীকারনামা',s.pledge,'full',5)}
    ${area('p_ap','অনুমোদন',s.approval,'full',3)}
   </div>
-  <div class="sec">আইডি কার্ড QR — যাচাই কোড</div>
-  <div class="grid"><div class="fld full"><span>এই কোড আইডি কার্ডের QR-এ বসে; পরিবর্তন করলে আগের সব ছাপানো কার্ডের QR অকার্যকর হয়ে যাবে</span>
-   <div style="display:flex;gap:8px"><input id="p_vk" readonly value="${esc(s.viewKey||genKey())}"><button type="button" class="btn sm ghost" onclick="regenVK()">নতুন কোড তৈরি</button></div></div></div>
-  <div class="row"><button type="button" class="btn sm ghost" onclick="testStatusLink()">QR লিংক টেস্ট করুন</button></div>
-  <p class="note">প্রথমে সংরক্ষণ করুন, তারপর এই বাটনে চাপুন — এটি প্রথম শিক্ষার্থীর হিসাব-পেজ কম্পিউটার/ফোনের ব্রাউজারে সরাসরি খুলে দেখাবে। এখানে হিসাব দেখা গেলে ধরে নেবেন ব্যাকএন্ড ঠিক আছে; QR স্ক্যানে সমস্যা হলে সেটা তখন স্ক্যানারের সমস্যা।</p>
+  <div class="sec">প্রত্যয়নপত্র ও সার্টিফিকেট ব্যাকগ্রাউন্ড ডিজাইন</div>
+  <div class="grid">${fileBox('p_certbg','ব্যাকগ্রাউন্ড ডিজাইন (A4 ল্যান্ডস্কেপ)',s.certBg,1600,900000)}</div>
+  <p class="note">এই ছবিটি প্রত্যয়নপত্র ও সার্টিফিকেটের পুরো পাতাজুড়ে ব্যাকগ্রাউন্ড হিসেবে বসবে (ধার/ফ্রেম-সহ ডিজাইন হলে ভালো হয়)।</p>
   <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
 }
 function genKey(){return uid()+uid().slice(0,4)}
-async function regenVK(){if(!await ask('নতুন কোড তৈরি করলে আগের সব আইডি কার্ডের QR অকার্যকর হয়ে যাবে। নিশ্চিত?'))return;$('#p_vk').value=genKey()}
-function testStatusLink(){
-  if(!DB.students.length)return toast('আগে অন্তত একজন শিক্ষার্থী ভর্তি করুন');
-  if(!DB.settings.viewKey)return toast('আগে সংরক্ষণ করুন, যাতে যাচাই কোড সক্রিয় হয়');
-  const url=statusURL(DB.students[0]);
-  if(!url)return toast('লিংক তৈরি করা যায়নি — config.js-এ API_URL ঠিক আছে কিনা দেখুন');
-  window.open(url,'_blank');
-}
 async function saveSetup(){
   const ex=DB.settings;
-  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,viewKey:v('p_vk')||genKey()};
+  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,certBg:FV.p_certbg||'',viewKey:ex.viewKey||genKey()};
   if(!await work(()=>batch([{op:'upsert',table:'settings',rec}])))return;
   Object.assign(DB.settings,rec,{directorSig:getSig('p_sig')});delete DB.settings.id;
   render();toast('সেটাপ সংরক্ষিত');
