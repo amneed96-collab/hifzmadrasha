@@ -984,9 +984,10 @@ function pCertificate(){AFTER=()=>fillCertList('ct');return certPage('ct','স�
 function certDoc(type,title,bodyHTML,date){
   const s=DB.settings;
   const sig=(label,name)=>`<div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">${label}</div>${name?`<div class="sgname">${esc(name)}</div>`:''}</div>`;
+  const left=type==='tp'?sig('লেখক',null):sig('প্রধান শিক্ষক (হিফয)',s.headTeacher);
   const bgStyle=s.certBg?` style="background-image:url('${s.certBg}')"`:'';
   return `<div class="cert"${bgStyle}>${wmIn()}${lh()}<div class="chead"><span class="csp"></span><div class="ctitle">${title}</div><div class="cmeta">তারিখ: ${fdate(date)}</div></div><div class="cbody">${bodyHTML}</div>
-  <div class="cfoot">${sig('প্রধান শিক্ষকের স্বাক্ষর (হিফয)',s.headTeacher)}${sig('পরিচালকের স্বাক্ষর',s.director)}${sig('লেখকের স্বাক্ষর',null)}</div></div>`;
+  <div class="cfoot">${left}${sig('পরিচালক',s.director)}</div></div>`;
 }
 function tpBody(name,father,mother,addr,sid,note){
   return `এই মর্মে প্রত্যয়ন করা যাচ্ছে যে, <b>${esc(name)}</b>, পিতা: ${esc(father)}, মাতা: ${esc(mother)}, সাং: ${esc(addr)}, আইডি নং: ${esc(sid)} — উক্ত শিক্ষার্থী আমাদের প্রতিষ্ঠানের একজন নিয়মিত শিক্ষার্থী। তার নৈতিক চরিত্র ও আচার-আচরণ সন্তোষজনক বলে প্রত্যয়ন করা হলো। আমি তার সর্বাঙ্গীণ মঙ্গল ও উজ্জ্বল ভবিষ্যৎ কামনা করছি।${note?'<br><br>'+esc(note):''}`;
