@@ -49,7 +49,7 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .fld input,.fld select,.fld textarea,.filters input,.filters select,.cell{border:1px solid var(--field);border-radius:5px;padding:8px 10px;background:#fff;width:100%;min-height:40px}
 .fld input[readonly]{background:#EEF3F7}
 .fld textarea{resize:vertical}
-.btn{border:1px solid var(--sea);background:var(--sea);color:#fff;border-radius:999px;padding:9px 20px;cursor:pointer;font-weight:600}
+.btn{border:1px solid var(--sea);background:var(--sea);color:#fff;border-radius:8px;padding:9px 20px;cursor:pointer;font-weight:600}
 .btn:hover{background:var(--sea2)}
 .btn.ghost{background:#fff;color:var(--sea)}
 .btn.ghost:hover{background:var(--tint)}
@@ -83,12 +83,13 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .chk input{margin-top:5px;width:18px;height:18px}
 .pledge{background:var(--tint);border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-bottom:8px;white-space:pre-wrap;font-size:14px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-left:4px solid var(--aqua);border-radius:6px;padding:14px}
 .kpi b{display:block;font-size:26px;line-height:1.2}
 .kpi span{color:var(--mute);font-size:13px}
-.kpi.hero{background:var(--sea);color:#fff;border-color:var(--sea);grid-column:span 2}
+.kpi.hero{background:var(--sea);color:#fff;border-color:var(--sea);border-left-color:#8FD6E8;grid-column:span 2}
 .kpi.hero span{color:#B9D6EA}
 .kpi.hero b{font-size:34px}
+.kpi.warn{border-left-color:var(--red)}
 .kpi.warn b{color:var(--red)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .bars div.b{display:grid;grid-template-columns:70px 1fr 40px;gap:8px;align-items:center;margin:8px 0}
@@ -138,6 +139,18 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .atts div{border:1px solid #6F8797;padding:6px;text-align:center;font-size:12px}
 .atts img{max-width:100%;max-height:340px}
 .rc{max-width:600px;margin:0 auto;border:1px solid #4E6A7C;padding:14px}
+@page pgdual{size:A4 landscape;margin:0}
+#printArea.pgdual{page:pgdual}
+.dualwrap{width:297mm;height:210mm;display:flex}
+.dualwrap .copy{width:148.5mm;height:210mm;box-sizing:border-box;padding:0.5in;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.dualwrap .copy .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
+.dualwrap .copy .wmk.in img{width:45%;max-width:none}
+.dualwrap .copylabel{text-align:center;font-weight:700;font-size:12px;color:#0A3D62;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.dualwrap .copybody{flex:1;overflow:hidden}
+.dualwrap .copybody .rc{border:none;max-width:none;margin:0;padding:0}
+.dualwrap .copyfoot{margin-top:auto;padding-top:6px}
+.dualwrap .dashline{border-top:1px dashed #888}
+.dualwrap .credit-fixed{text-align:center;font-size:9px;color:#666;padding-top:3px}
 .rc .kv{font-size:11.5px}
 .rc .kv th{width:auto}
 .wmk{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:-1;pointer-events:none}
@@ -218,17 +231,18 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
 .cert .lh{margin-bottom:6mm}
-.cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:5mm}
+.cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:12mm}
 .cert .chead .csp{flex:1}
 .cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:700;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
 .cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
-.cert .cbody{font-size:16px;line-height:2.1;text-align:justify;flex:1;color:#000}
+.cert .cbody{font-size:19px;line-height:2.05;text-align:justify;flex:1;color:#000}
 .cert .cbody b{font-weight:700}
 .cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14mm;font-size:16px;gap:10mm}
 .cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
-.cert .csig .sgl{border-top:1px solid #000;padding-top:4px;font-size:16px;white-space:nowrap;color:#000}
-.cert .csig .sgname{font-size:15px;color:#000;font-weight:700;white-space:nowrap;margin-top:2px}
+.cert .csig .sline{border-top:1px solid #000;margin:0}
+.cert .csig .sgname{font-size:15px;color:#000;font-weight:700;white-space:nowrap;margin-top:6px}
+.cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -360,9 +374,14 @@ const CREDIT='@AM Shahed: 01605721296';
 const wmIn=()=>DB.settings.logo?`<div class="wmk in"><img src="${DB.settings.logo}" alt=""></div>`:'';
 const boxed=h=>'<div class="rcwrap">'+h.replace('<div class="doc rc">','<div class="doc rc">'+wmIn())+`<div class="rccredit">${CREDIT}</div></div>`;
 const printBox=h=>printHTML(boxed(h),{nowm:true,nocredit:true});
+function dualCopyHTML(contentHTML,leftLabel,rightLabel){
+  const copy=label=>`<div class="copy">${wmIn()}<div class="copylabel">${label}</div><div class="copybody">${contentHTML}</div><div class="copyfoot"><div class="dashline"></div><div class="credit-fixed">${CREDIT}</div></div></div>`;
+  return `<div class="dualwrap">${copy(leftLabel)}${copy(rightLabel)}</div>`;
+}
+const printDual=(h,l,r)=>printHTML(dualCopyHTML(h,l,r),{dual:true,nowm:true});
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
 function printHTML(h,o){o=o||{};
-  const cls=o.nocredit?(o.landscape?'pgln':''):(o.landscape?'pgl':'pgc');
+  const cls=o.dual?'pgdual':(o.nocredit?(o.landscape?'pgln':''):(o.landscape?'pgl':'pgc'));
   $('#printArea').className=cls;
   $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h;
   setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
@@ -420,13 +439,19 @@ const MENU=[
 ];
 const OPEN={};
 let R={page:'dash',view:'list',id:null},AFTER=null;
+function toggleGroup(t){const willOpen=!OPEN[t];Object.keys(OPEN).forEach(k=>{OPEN[k]=false});OPEN[t]=willOpen;drawMenu()}
 function drawMenu(){
   const s=DB.settings;
   $('#drawer').innerHTML=`<div class="dh">${esc(s.name||'হিফয মাদরাসা')}<small>ব্যবস্থাপনা সফটওয়্যার</small></div>`+MENU.map(m=>{
     if(!m.sub)return `<button class="mi ${R.page===m.k?'act':''}" onclick="go('${m.k}')">${m.t}</button>`;
-    return `<div class="grp ${OPEN[m.t]?'open':''}"><button class="mi" onclick="OPEN['${m.t}']=!OPEN['${m.t}'];drawMenu()">${m.t}<span class="ch">›</span></button><div class="sub">${m.sub.map(x=>`<button class="mi ${R.page===x[0]?'act':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</div></div>`}).join('')+`<button class="mi" style="font-weight:400;color:var(--mute)" onclick="toggleMenu(false);logout('')">লগআউট</button>`;
+    const has=m.sub.some(x=>x[0]===R.page),op=OPEN[m.t]||has;
+    return `<div class="grp ${op?'open':''}"><button class="mi" onclick="toggleGroup('${m.t}')">${m.t}<span class="ch">›</span></button><div class="sub">${m.sub.map(x=>`<button class="mi ${R.page===x[0]?'act':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</div></div>`}).join('')+`<button class="mi" style="font-weight:400;color:var(--mute)" onclick="toggleMenu(false);logout('')">লগআউট</button>`;
 }
-function toggleMenu(force){const d=$('#drawer'),o=typeof force==='boolean'?force:!d.classList.contains('open');d.classList.toggle('open',o);$('#scrim').classList.toggle('open',o);$('#burger').setAttribute('aria-expanded',o)}
+function toggleMenu(force){
+  const d=$('#drawer'),o=typeof force==='boolean'?force:!d.classList.contains('open');
+  d.classList.toggle('open',o);$('#scrim').classList.toggle('open',o);$('#burger').setAttribute('aria-expanded',o);
+  if(!o){for(const k in OPEN)delete OPEN[k];drawMenu()}
+}
 const TBL={stu:'students',fee:'collections',stf:'staff',sal:'salaries'};
 async function go(page,view,id){
   toggleMenu(false);if(!LOADED)return;
@@ -640,7 +665,7 @@ function receiptDoc(c){
   ${c.note?`<div>মন্তব্য: ${esc(c.note)}</div>`:''}
   <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
 }
-async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printBox(receiptDoc(c))}catch(e){handleErr(e)}}
+async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printDual(receiptDoc(c),'অফিস কপি','শিক্ষার্থী কপি')}catch(e){handleErr(e)}}
 async function shareRc(id){
   let c;try{c=await hydrate('collections',DB.collections.find(x=>x.id===id))}catch(e){return handleErr(e)}
   shareDoc(boxed(receiptDoc(c)),'receipt-'+c.receiptNo+'.png','ফি রশিদ',640,true);
@@ -832,10 +857,10 @@ async function delSal(id){if(!await ask('এই বেতনের রেকর�
 async function printSal(id){
   let x;try{x=await hydrate('salaries',DB.salaries.find(s=>s.id===id))}catch(e){return handleErr(e)}
   const t=DB.staff.find(s=>s.id===x.staffId)||{name:'',desig:'',tid:''};
-  printBox(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
+  printDual(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
   <table class="kv">${kvRows([['নাম',esc(t.name)],['আইডি',bn(t.tid)],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
   <table class="kv"><tr><th>মূল বেতন</th><td class="n">${tk(x.base)}</td></tr><tr><th>ভাতা / বোনাস</th><td class="n">${tk(x.extra)}</td></tr><tr><th>কর্তন / অগ্রিম</th><td class="n">${tk(x.ded)}</td></tr><tr><th>নিট বেতন</th><td class="n"><b>${tk(x.net)}</b></td></tr><tr><th>প্রদত্ত</th><td class="n"><b>${tk(x.paid)}</b></td></tr></table>
-  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
+  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`,'অফিস কপি','কর্মীর কপি');
 }
 
 /* ================= fee rules (table) ================= */
@@ -983,7 +1008,7 @@ function pCertLetter(){AFTER=()=>fillCertList('tp');return certPage('tp','প্
 function pCertificate(){AFTER=()=>fillCertList('ct');return certPage('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
 function certDoc(type,title,bodyHTML,date){
   const s=DB.settings;
-  const sig=(label,name)=>`<div class="csig"><div class="sigimg" style="height:44px"></div><div class="sgl">${label}</div>${name?`<div class="sgname">${esc(name)}</div>`:''}</div>`;
+  const sig=(label,name)=>`<div class="csig"><div class="sigimg" style="height:44px"></div><div class="sline"></div>${name?`<div class="sgname">${esc(name)}</div>`:''}<div class="sgl">${label}</div></div>`;
   const left=type==='tp'?sig('লেখক',null):sig('প্রধান শিক্ষক (হিফয)',s.headTeacher);
   const bgStyle=s.certBg?` style="background-image:url('${s.certBg}')"`:'';
   return `<div class="cert"${bgStyle}>${wmIn()}${lh()}<div class="chead"><span class="csp"></span><div class="ctitle">${title}</div><div class="cmeta">তারিখ: ${fdate(date)}</div></div><div class="cbody">${bodyHTML}</div>
