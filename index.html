@@ -122,7 +122,8 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .lh img{position:absolute;left:0;top:0;height:66px;width:66px;object-fit:cover;border-radius:50%}
 .lh .lt{padding:0 78px}
 .lh h2{margin:0 0 2px;font-size:30px;line-height:1.25;color:#0A3D62}
-.rc .lh h2{font-size:24px}
+.rc .lh h2{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc .lhbadge{top:auto;bottom:2px}
 .lh p{margin:0;font-size:12.5px}
 .lh .lhbadge{position:absolute;right:0;top:2px;width:78px;text-align:right;font-weight:700;font-size:11px;letter-spacing:.3px;color:#0A3D62;line-height:1.3}
 .dt{display:table;margin:8px auto;border:1.5px solid #0A3D62;border-radius:4px;padding:3px 26px;font-weight:700;font-size:16px;color:#0A3D62}
@@ -923,10 +924,11 @@ async function delSal(id){if(!await ask('এই বেতনের রেকর�
 async function printSal(id){
   let x;try{x=await hydrate('salaries',DB.salaries.find(s=>s.id===id))}catch(e){return handleErr(e)}
   const t=DB.staff.find(s=>s.id===x.staffId)||{name:'',desig:'',tid:''};
-  printDual(`<div class="doc rc">${lh()}<div class="dt">বেতন ভাউচার</div><div class="dmeta"><div>ভাউচার নং: <b>${bn(x.no)}</b></div><div>তারিখ: <b>${fdate(x.date)}</b></div></div>
+  const body=badge=>`<div class="doc rc">${lh(badge)}<div class="dthead"><div class="dtl">ভাউচার নং: <b>${bn(x.no)}</b></div><div class="dt">বেতন ভাউচার</div><div class="dtr">তারিখ: <b>${fdate(x.date)}</b></div></div>
   <table class="kv">${kvRows([['নাম',esc(t.name)],['আইডি',bn(t.tid)],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
   <table class="kv"><tr><th>মূল বেতন</th><td class="n">${tk(x.base)}</td></tr><tr><th>ভাতা / বোনাস</th><td class="n">${tk(x.extra)}</td></tr><tr><th>কর্তন / অগ্রিম</th><td class="n">${tk(x.ded)}</td></tr><tr><th>নিট বেতন</th><td class="n"><b>${tk(x.net)}</b></td></tr><tr><th>প্রদত্ত</th><td class="n"><b>${tk(x.paid)}</b></td></tr></table>
-  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`,'অফিস কপি','কর্মীর কপি');
+  ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
+  printHTML(`<div class="dualwrap">${dualPane(body('অফিস কপি'))}${dualPane(body('কর্মীর কপি'))}</div>`,{dual:true,nowm:true});
 }
 
 /* ================= fee rules (table) ================= */
