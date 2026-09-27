@@ -60,6 +60,10 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .btn.danger:hover{background:#FBEDEA}
 .btn.aqua{background:var(--aqua);border-color:var(--aqua);color:#04263A}
 .btn.aqua:hover{background:#4CBAD4}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.ok:hover{background:#175F45}
+.btn.solidred{background:var(--red);border-color:var(--red);color:#fff}
+.btn.solidred:hover{background:#8F2E22}
 .btn.sm{padding:4px 13px;font-size:13px}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
 .tbl .acts{flex-wrap:nowrap}
@@ -91,10 +95,7 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--aqua)}
 .kpi b{display:block;font-size:24px;line-height:1.2;color:var(--deep)}
 .kpi span{color:var(--mute);font-size:13px;font-weight:600}
-.kpi.hero{background:var(--sea);color:#fff;border-color:var(--sea)}
-.kpi.hero::before{background:#8FD6E8}
-.kpi.hero span{color:#B9D6EA}
-.kpi.hero b{color:#fff}
+.kpi.hero{background:#fff}
 .kpi.warn::before{background:var(--red)}
 .kpi.warn b{color:var(--red)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -125,7 +126,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .rc .lh h2{font-size:24px;white-space:nowrap}
 .rc .lhbadge{top:45px}
 .lh p{margin:0;font-size:12.5px}
-.lh .lhbadge{position:absolute;right:0;top:2px;width:78px;text-align:right;font-weight:700;font-size:11px;letter-spacing:.3px;color:#0A3D62;line-height:1.3}
+.lh .lhbadge{position:absolute;right:0;top:45px;width:78px;text-align:right;font-weight:700;font-size:11px;letter-spacing:.3px;color:#0A3D62;line-height:1.3}
 .dt{display:table;margin:8px auto;border:1.5px solid #0A3D62;border-radius:4px;padding:3px 26px;font-weight:700;font-size:16px;color:#0A3D62}
 .dmeta{display:flex;justify-content:space-between;margin-bottom:8px}
 .dthead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 10px}
@@ -498,11 +499,10 @@ const MENU=[
  {k:'dash',t:'ড্যাশবোর্ড'},
  {t:'শিক্ষার্থী',sub:[['stu','ভর্তি ফরম'],['fee','মাসিক ফি আদায়'],['idc','আইডি কার্ড']]},
  {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম'],['sidc','আইডি কার্ড']]},
- {k:'rules',t:'ফি নির্ধারণ'},
  {k:'exp',t:'খরচ'},
  {t:'সার্টিফিকেট',sub:[['tp','প্রত্যয়নপত্র'],['ct','সার্টিফিকেট']]},
  {t:'রিপোর্ট',sub:[['rm','মাসিক'],['ry','বাৎসরিক'],['rt','সর্বমোট']]},
- {t:'ব্যবস্থাপনা',sub:[['setup','প্রতিষ্ঠান সেটাপ'],['ntc','নোটিশ']]}
+ {t:'ব্যবস্থাপনা',sub:[['rules','ফি নির্ধারণ'],['setup','প্রতিষ্ঠান সেটাপ'],['ntc','নোটিশ']]}
 ];
 const OPEN={};
 let R={page:'dash',view:'list',id:null},AFTER=null;
@@ -511,7 +511,7 @@ function drawMenu(){
   const s=DB.settings;
   $('#drawer').innerHTML=`<div class="dh">${esc(s.name||'হিফয মাদরাসা')}<small>ব্যবস্থাপনা সফটওয়্যার</small></div>`+MENU.map(m=>{
     if(!m.sub)return `<button class="mi ${R.page===m.k?'act':''}" onclick="go('${m.k}')">${m.t}</button>`;
-    const has=m.sub.some(x=>x[0]===R.page),op=OPEN[m.t]||has;
+    const op=!!OPEN[m.t];
     return `<div class="grp ${op?'open':''}"><button class="mi" onclick="toggleGroup('${m.t}')">${m.t}<span class="ch">›</span></button><div class="sub">${m.sub.map(x=>`<button class="mi ${R.page===x[0]?'act':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</div></div>`}).join('')+`<button class="mi" style="font-weight:400;color:var(--mute)" onclick="toggleMenu(false);logout('')">লগআউট</button>`;
 }
 function toggleMenu(force){
@@ -523,7 +523,7 @@ const TBL={stu:'students',fee:'collections',stf:'staff',sal:'salaries'};
 async function go(page,view,id){
   toggleMenu(false);if(!LOADED)return;
   if(view==='form'&&id&&TBL[page]){try{await hydrate(TBL[page],DB[TBL[page]].find(x=>x.id===id))}catch(e){return handleErr(e)}}
-  MENU.forEach(m=>{if(m.sub&&m.sub.some(x=>x[0]===page))OPEN[m.t]=true});
+  for(const k in OPEN)delete OPEN[k];
   R={page,view:view||'list',id:id||null};RT=null;EXID=null;ET=null;render();window.scrollTo(0,0);
 }
 function render(){
@@ -542,7 +542,7 @@ function pDash(){
   const mx=Math.max(1,...DEPTS.map(d=>st.filter(s=>s.dept===d).length));
   const rec=DB.collections.slice().sort((a,b)=>(b.date+pad(b.receiptNo,8))>(a.date+pad(a.receiptNo,8))?1:-1).slice(0,6);
   return `<div class="bar"><div><h1>ড্যাশবোর্ড</h1><span class="note">${fdate(today())}</span></div>
-  <div class="acts"><button class="btn" onclick="go('stu','form')">+ নতুন ভর্তি</button><button class="btn aqua" onclick="go('fee','form')">ফি আদায়</button><button class="btn ghost" onclick="go('exp')">খরচ যোগ</button></div></div>
+  <div class="acts"><button class="btn" onclick="go('stu','form')">+ নতুন ভর্তি</button><button class="btn ok" onclick="go('fee','form')">ফি আদায়</button><button class="btn solidred" onclick="go('exp')">খরচ যোগ</button></div></div>
   ${DB.settings.name?'':`<div class="panel">শুরু করতে <a href="#" onclick="go('setup');return false">প্রতিষ্ঠান সেটাপ</a> পূরণ করুন, তারপর <a href="#" onclick="go('rules');return false">ফি নির্ধারণ</a> করুন।</div>`}
   <div class="kpis">
    <div class="kpi hero"><span>${fmonth(cm)} মাসে আদায়</span><b>${tk(D.inc)}</b></div>
