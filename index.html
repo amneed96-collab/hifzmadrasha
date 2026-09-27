@@ -220,14 +220,16 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .pprev-bar b{font-size:15px}
 .pprev-bar .acts{gap:8px}
 .pprev-body{flex:1;overflow:auto;padding:22px;display:flex;justify-content:center}
-.pprev-page{background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.4);max-width:100%}
+.pprev-page{background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.4);flex:none}
+.pprev-body{align-items:flex-start}
 @media print{#pprev{display:none!important}}
 #stage{display:block;position:fixed;left:-10000px;top:0;width:640px;background:#fff}
 #stage .wmk{position:absolute}
 #stage .credit{position:static;text-align:right;margin-top:8px}
 @media print{
+ html,body{height:100%}
  body{background:#fff}
- #app,#toast,#dlg,#busy{display:none!important}
+ #app,#toast,#dlg,#busy,#pprev{display:none!important}
  #printArea{display:block;position:relative;z-index:0}
  #stage{display:none}
  @page{size:A4;margin:10mm 12mm}
@@ -239,9 +241,10 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea.pgc{page:pgc}
 @page pgl{size:A4 landscape;margin:14mm 16mm;@bottom-right{content:"@AM Shahed: 01605721296";font-size:7px;color:#666;vertical-align:top;padding-top:1.5mm}}
 #printArea.pgl{page:pgl}
-@page pgln{size:A4 landscape;margin:15mm}
+@page pgln{size:A4 landscape;margin:0.3in}
 #printArea.pgln{page:pgln}
-.cert{padding:0.3in;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
+#printArea.pgln{height:100%}
+.cert{padding:0.3in;position:relative;z-index:0;height:100%;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
 .cert .lh{margin-bottom:6mm}
@@ -395,14 +398,45 @@ function dualCopyHTML(contentHTML,leftLabel,rightLabel){
 }
 const printDual=(h,l,r)=>printHTML(dualCopyHTML(h,l,r),{dual:true,nowm:true});
 const wmHTML=()=>DB.settings.logo?`<div class="wmk"><img src="${DB.settings.logo}" alt=""></div>`:'';
+const PAGE_SPEC={
+  '':{w:210,h:297,m:[10,12,10,12]},
+  pgc:{w:210,h:297,m:[10,12,10,12]},
+  pgl:{w:297,h:210,m:[14,16,14,16]},
+  pgln:{w:297,h:210,m:[7.62,7.62,7.62,7.62]},
+  pgdual:{w:297,h:210,m:[0,0,0,0]}
+};
 function printHTML(h,o){o=o||{};
   const cls=o.dual?'pgdual':(o.nocredit?(o.landscape?'pgln':''):(o.landscape?'pgl':'pgc'));
   $('#printArea').className=cls;
   $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h;
-  $('#pprevPage').className='pprev-page '+cls;
-  $('#pprevPage').innerHTML=$('#printArea').innerHTML;
-  $('#pprev').classList.add('show');
+  showPreview(cls);
 }
+function showPreview(cls){
+  const spec=PAGE_SPEC[cls]||PAGE_SPEC[''];
+  const page=$('#pprevPage');
+  const fixed=cls==='pgln'||cls==='pgdual';
+  page.className='pprev-page '+cls;
+  page.style.width=spec.w+'mm';
+  page.style[fixed?'height':'minHeight']=spec.h+'mm';
+  page.style.padding=spec.m[0]+'mm '+spec.m[1]+'mm '+spec.m[2]+'mm '+spec.m[3]+'mm';
+  page.style.boxSizing='border-box';
+  page.style.overflow=fixed?'hidden':'visible';
+  page.innerHTML=$('#printArea').innerHTML;
+  $('#pprev').classList.add('show');
+  requestAnimationFrame(fitPreview);
+}
+function fitPreview(){
+  const page=$('#pprevPage'),wrap=page.parentElement;
+  if(!page||!wrap||!wrap.clientWidth)return;
+  page.style.transform='none';page.style.marginBottom='0px';
+  const naturalW=page.offsetWidth,naturalH=page.offsetHeight;
+  const availW=wrap.clientWidth-40,availH=wrap.clientHeight-40;
+  const scale=Math.max(.15,Math.min(1,availW/naturalW,availH/naturalH));
+  page.style.transformOrigin='top center';
+  page.style.transform='scale('+scale+')';
+  page.style.marginBottom=(naturalH*scale-naturalH)+'px';
+}
+window.addEventListener('resize',()=>{if($('#pprev').classList.contains('show'))fitPreview()});
 function closePreview(){$('#pprev').classList.remove('show');$('#pprevPage').innerHTML=''}
 function doPrint(){setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML='';closePreview()});
