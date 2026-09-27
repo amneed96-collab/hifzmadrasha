@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0A3D62">
 <title>হিফয মাদরাসা ব্যবস্থাপনা</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 <script src="config.js"></script>
@@ -12,7 +15,7 @@
 :root{--sea:#0A3D62;--sea2:#0F5A8F;--deep:#062A44;--aqua:#1FA3C4;--ink:#10212E;--mute:#56707F;--bg:#E9F1F7;--line:#CBDCE8;--field:#B3C7D6;--red:#B3392B;--ok:#1F7A5A;--tint:#EEF5FA}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font-family:'Noto Sans Bengali','Hind Siliguri','Kalpurush','Nirmala UI','Vrinda',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+body{margin:0;font-family:'Noto Sans Bengali','Hind Siliguri','Kalpurush','Nirmala UI','Vrinda',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;font-synthesis:none}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
 .top{position:sticky;top:0;z-index:30;background:var(--sea);color:#fff;height:56px;display:flex;align-items:center;gap:12px;padding:0 12px}
@@ -227,21 +230,21 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea.pgl{page:pgl}
 @page pgln{size:A4 landscape;margin:15mm}
 #printArea.pgln{page:pgln}
-.cert{padding:14mm 20mm;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
+.cert{padding:0.5in;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
 .cert .lh{margin-bottom:6mm}
 .cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:12mm}
 .cert .chead .csp{flex:1}
-.cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:700;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
+.cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:400;-webkit-text-stroke:0.8px currentColor;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
 .cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
 .cert .cbody{font-size:19px;line-height:2.05;text-align:justify;flex:1;color:#000}
-.cert .cbody b{font-weight:700}
+.cert .cbody b{font-weight:400;-webkit-text-stroke:0.6px currentColor}
 .cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14mm;font-size:16px;gap:10mm}
 .cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
 .cert .csig .sline{border-top:1px solid #000;margin:0}
-.cert .csig .sgname{font-size:15px;color:#000;font-weight:700;white-space:nowrap;margin-top:6px}
+.cert .csig .sgname{font-size:15px;color:#000;font-weight:400;-webkit-text-stroke:0.6px currentColor;white-space:nowrap;margin-top:6px}
 .cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
