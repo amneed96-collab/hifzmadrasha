@@ -85,14 +85,17 @@ h1{font-size:22px;margin:0 0 4px;color:var(--deep)}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:14px}
 .chk input{margin-top:5px;width:18px;height:18px}
 .pledge{background:var(--tint);border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-bottom:8px;white-space:pre-wrap;font-size:14px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#fff;border:1px solid var(--line);border-left:4px solid var(--aqua);border-radius:6px;padding:14px}
-.kpi b{display:block;font-size:26px;line-height:1.2}
-.kpi span{color:var(--mute);font-size:13px}
-.kpi.hero{background:var(--sea);color:#fff;border-color:var(--sea);border-left-color:#8FD6E8;grid-column:span 2}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:92px;box-shadow:0 1px 3px rgba(10,61,98,.07);transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(10,61,98,.14)}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--aqua)}
+.kpi b{display:block;font-size:24px;line-height:1.2;color:var(--deep)}
+.kpi span{color:var(--mute);font-size:13px;font-weight:600}
+.kpi.hero{background:var(--sea);color:#fff;border-color:var(--sea)}
+.kpi.hero::before{background:#8FD6E8}
 .kpi.hero span{color:#B9D6EA}
-.kpi.hero b{font-size:34px}
-.kpi.warn{border-left-color:var(--red)}
+.kpi.hero b{color:#fff}
+.kpi.warn::before{background:var(--red)}
 .kpi.warn b{color:var(--red)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .bars div.b{display:grid;grid-template-columns:70px 1fr 40px;gap:8px;align-items:center;margin:8px 0}
@@ -208,9 +211,17 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #stage .ntc{width:794px;min-height:1123px;padding:40px 48px;background:#fff;box-sizing:border-box}
 .erow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
 .erow .c{flex:2;min-width:0}.erow .m{flex:1;min-width:0}
-@media(max-width:720px){.two{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.kpi.hero{grid-column:span 1}main{padding:12px}}
+@media(max-width:720px){.two{grid-template-columns:1fr}.filters{grid-template-columns:1fr}main{padding:12px}}
 @media screen{.cards{zoom:.9}}
 #printArea{display:none}
+#pprev{position:fixed;inset:0;background:rgba(6,42,68,.68);z-index:200;display:none;flex-direction:column}
+#pprev.show{display:flex}
+.pprev-bar{flex:none;background:var(--deep);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;flex-wrap:wrap}
+.pprev-bar b{font-size:15px}
+.pprev-bar .acts{gap:8px}
+.pprev-body{flex:1;overflow:auto;padding:22px;display:flex;justify-content:center}
+.pprev-page{background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.4);max-width:100%}
+@media print{#pprev{display:none!important}}
 #stage{display:block;position:fixed;left:-10000px;top:0;width:640px;background:#fff}
 #stage .wmk{position:absolute}
 #stage .credit{position:static;text-align:right;margin-top:8px}
@@ -230,7 +241,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 #printArea.pgl{page:pgl}
 @page pgln{size:A4 landscape;margin:15mm}
 #printArea.pgln{page:pgln}
-.cert{padding:0.5in;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
+.cert{padding:0.3in;position:relative;z-index:0;min-height:170mm;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
 .cert .lh{margin-bottom:6mm}
@@ -238,14 +249,14 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .cert .chead .csp{flex:1}
 .cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:400;-webkit-text-stroke:0.8px currentColor;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
 .cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
-.cert .cbody{font-size:19px;line-height:2.05;text-align:justify;flex:1;color:#000}
+.cert .cbody{font-size:18px;line-height:2.05;text-align:justify;flex:1;color:#000}
 .cert .cbody b{font-weight:400;-webkit-text-stroke:0.6px currentColor}
 .cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14mm;font-size:16px;gap:10mm}
 .cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
 .cert .csig .sline{border-top:1px solid #000;margin:0}
 .cert .csig .sgname{font-size:15px;color:#000;font-weight:400;-webkit-text-stroke:0.6px currentColor;white-space:nowrap;margin-top:6px}
-.cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px}
+.cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px;border-top:none;padding-top:0}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -264,6 +275,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
   <footer id="foot"></footer>
 </div>
 <div id="printArea"></div>
+<div id="pprev"><div class="pprev-bar"><b>প্রিন্ট প্রিভিউ</b><div class="acts row" style="margin:0"><button class="btn" onclick="doPrint()">🖨️ প্রিন্ট করুন</button><button class="btn ghost" onclick="closePreview()">বন্ধ করুন</button></div></div><div class="pprev-body"><div class="pprev-page" id="pprevPage"></div></div></div>
 <div id="stage"></div>
 <div id="toast" role="status"></div>
 <div id="busy"><span>অপেক্ষা করুন…</span></div>
@@ -387,8 +399,13 @@ function printHTML(h,o){o=o||{};
   const cls=o.dual?'pgdual':(o.nocredit?(o.landscape?'pgln':''):(o.landscape?'pgl':'pgc'));
   $('#printArea').className=cls;
   $('#printArea').innerHTML=(o.nowm?'':wmHTML())+h;
-  setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
-window.addEventListener('afterprint',()=>{$('#printArea').innerHTML=''});
+  $('#pprevPage').className='pprev-page '+cls;
+  $('#pprevPage').innerHTML=$('#printArea').innerHTML;
+  $('#pprev').classList.add('show');
+}
+function closePreview(){$('#pprev').classList.remove('show');$('#pprevPage').innerHTML=''}
+function doPrint(){setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
+window.addEventListener('afterprint',()=>{$('#printArea').innerHTML='';closePreview()});
 function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
 const sg=(src,label)=>`<div class="sgb">${src&&src!=='@'?`<img class="sigimg" src="${src}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">${label}</div></div>`;
 const kvRows=p=>{let h='';for(let i=0;i<p.length;i+=2){const a=p[i],b=p[i+1];h+=`<tr><th>${a[0]}</th><td>${a[1]||'&nbsp;'}</td>${b?`<th>${b[0]}</th><td>${b[1]||'&nbsp;'}</td>`:'<td colspan="2"></td>'}</tr>`}return h};
