@@ -18,12 +18,14 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;font-family:'Noto Sans Bengali','Hind Siliguri','Kalpurush','Nirmala UI','Vrinda',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;font-synthesis:none}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--aqua);outline-offset:2px}
-.top{position:sticky;top:0;z-index:30;background:var(--sea);color:#fff;height:56px;display:flex;align-items:center;gap:12px;padding:0 12px}
-.burger{width:42px;height:42px;border:0;background:transparent;border-radius:6px;display:grid;place-content:center;cursor:pointer}
+.top{position:sticky;top:0;z-index:30;background:var(--sea);color:#fff;height:56px;display:flex;align-items:center;gap:6px;padding:0 8px}
+.burger{width:42px;height:42px;flex:0 0 auto;border:0;background:transparent;border-radius:6px;display:grid;place-content:center;cursor:pointer}
 .burger:hover{background:rgba(255,255,255,.14)}
-.brand{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.brand img{height:34px;width:34px;border-radius:50%;background:#fff;object-fit:cover;vertical-align:middle;margin-right:8px}
-#stat{font-size:12px;opacity:.8;white-space:nowrap}
+.brand{flex:1;min-width:0;text-align:center;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hlogo{flex:0 0 auto;width:38px;height:38px;display:grid;place-content:center}
+.hlogo img{width:36px;height:36px;border-radius:50%;background:#fff;object-fit:cover;display:block}
+#stat{font-size:12px;color:var(--mute);text-align:center;padding:4px 0;background:var(--tint);border-bottom:1px solid var(--line)}
+#stat:empty{display:none;padding:0;border:0}
 .scrim{position:fixed;inset:0;background:rgba(6,42,68,.55);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
 .scrim.open{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;bottom:0;left:0;width:280px;max-width:86vw;background:#fff;z-index:50;transform:translateX(-102%);transition:transform .25s ease;overflow-y:auto;box-shadow:2px 0 14px rgba(0,0,0,.25)}
@@ -274,6 +276,21 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .cert .csig .sline{border-top:1px solid #000;margin:0}
 .cert .csig .sgname{font-size:15px;color:#000;font-weight:400;-webkit-text-stroke:0.6px currentColor;white-space:nowrap;margin-top:6px;text-align:center}
 .cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px;border-top:none;padding-top:0;text-align:center}
+.loginwrap{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.loginbox{max-width:360px;width:100%;text-align:center}
+.loginlogo{width:64px;height:64px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--line);margin:0 auto 12px;display:block}
+.logintitle{font-size:20px;margin:0 0 4px;color:var(--deep);text-align:center}
+.loginsub{color:var(--mute);font-size:13px;margin:0 0 18px;text-align:center}
+.loginerr{color:var(--red);text-align:center;font-size:13.5px;background:#FBEDEA;border-radius:6px;padding:8px 10px;margin:0 0 14px}
+.loginbox .fld{text-align:left}
+.pwbox{position:relative}
+.pwbox input{width:100%;padding-right:42px}
+.pweye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;background:transparent;border-radius:6px;display:grid;place-content:center;cursor:pointer;color:var(--mute)}
+.pweye:hover{background:var(--tint)}
+.loginrecover{text-align:center;color:var(--sea2);font-size:13.5px;font-weight:600;margin:18px 0 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.loginrecover:hover{color:var(--sea)}
+#recBox{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:10px;text-align:left}
+#recResult{text-align:center}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -284,8 +301,9 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
     <div class="brand" id="brand">হিফয মাদরাসা</div>
-    <div id="stat"></div>
+    <div class="hlogo" id="hlogo"></div>
   </header>
+  <div id="stat"></div>
   <div class="scrim" id="scrim" onclick="toggleMenu()"></div>
   <nav class="drawer" id="drawer"></nav>
   <main id="main"></main>
@@ -331,7 +349,7 @@ const busy=on=>$('#busy').classList.toggle('show',!!on);
 const setStat=t=>{const e=$('#stat');if(e)e.textContent=t};
 
 /* ================= data + Google Sheet API ================= */
-const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
+const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorNid:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
 let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
 const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created','ts']);
@@ -350,7 +368,7 @@ async function api(action,payload){
 }
 const batch=ops=>api('batch',{ops});
 const seqOp=patch=>({op:'upsert',table:'settings',rec:{id:'main',seq:Object.assign({},DB.seq,patch)}});
-async function work(fn){busy(true);try{await fn();setStat('Google শীটে সংরক্ষিত');return true}catch(e){handleErr(e);return false}finally{busy(false)}}
+async function work(fn){busy(true);try{await fn();setStat('');return true}catch(e){handleErr(e);return false}finally{busy(false)}}
 function handleErr(e){if(String(e.message)==='AUTH'){logout('পাসওয়ার্ড ভুল বা বদলে গেছে');return}toast('সংযোগ ব্যর্থ: '+(e.message||e));setStat('সংযোগ নেই')}
 function logout(msg){$('#foot').innerHTML='';PW='';try{localStorage.removeItem('madrasa_pw')}catch(e){}LOADED=false;$('#main').innerHTML=pLogin(msg||'')}
 async function hydrate(table,rec){
@@ -370,7 +388,8 @@ async function reload(){
     if(!DB.settings.pledge)DB.settings.pledge=PLEDGE;if(!DB.settings.approval)DB.settings.approval=APPROVAL;
     const mx=(a,f)=>a.reduce((t,x)=>Math.max(t,+x[f]||0),0);
     DB.seq={form:Math.max(+sq.form||0,mx(DB.students,'formNo')),receipt:Math.max(+sq.receipt||0,mx(DB.collections,'receiptNo')),staff:Math.max(+sq.staff||0,DB.staff.reduce((t,x)=>Math.max(t,+String(x.tid).replace(/\D/g,'')||0),0)),voucher:Math.max(+sq.voucher||0,mx(DB.expenses,'no')),salary:Math.max(+sq.salary||0,mx(DB.salaries,'no'))};
-    LOADED=true;setStat('Google শীটে সংরক্ষিত');
+    LOADED=true;setStat('');
+    try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}
     R={page:'dash',view:'list',id:null};render();
   }catch(e){
     LOADED=false;
@@ -378,10 +397,50 @@ async function reload(){
     else{setStat('সংযোগ নেই');$('#main').innerHTML=`<div class="panel"><h1>সংযোগ করা যায়নি</h1><p>${esc(e.message||e)}</p><p class="note">config.js-এ লিংক ঠিক আছে কিনা এবং Apps Script “Anyone” অ্যাক্সেসে ডিপ্লয় করা আছে কিনা দেখুন।</p><div class="row"><button class="btn" onclick="reload()">আবার চেষ্টা করুন</button></div></div>`}
   }finally{busy(false)}
 }
-function pLogin(err){return `<div class="panel" style="max-width:380px;margin:40px auto"><h1>প্রবেশ করুন</h1><p class="note">Apps Script-এ সেট করা পাসওয়ার্ড দিন।</p>${err?`<p style="color:var(--red)">${esc(err)}</p>`:''}<label class="fld"><span>পাসওয়ার্ড</span><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></label><div class="row"><button class="btn" onclick="doLogin()">প্রবেশ</button></div></div>`}
+const EYE_OPEN='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_CLOSED='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.8 21.8 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+const cacheGet=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+function paintHeader(){
+  const name=LOADED?(DB.settings.name||cacheGet('madrasa_name')||'হিফয মাদরাসা'):(cacheGet('madrasa_name')||'হিফয মাদরাসা');
+  const logo=LOADED?(DB.settings.logo||cacheGet('madrasa_logo')||''):cacheGet('madrasa_logo');
+  const b=$('#brand'),h=$('#hlogo');
+  if(b)b.textContent=name;
+  if(h)h.innerHTML=logo?`<img src="${logo}" alt="">`:'';
+}
+function pLogin(err){
+  const name=cacheGet('madrasa_name'),logo=cacheGet('madrasa_logo');
+  return `<div class="loginwrap"><div class="panel loginbox">
+  ${logo?`<img class="loginlogo" src="${logo}" alt="">`:''}
+  <h1 class="logintitle">${esc(name||'প্রবেশ করুন')}</h1>
+  <p class="loginsub">ব্যবস্থাপনা সফটওয়্যার</p>
+  ${err?`<p class="loginerr">${esc(err)}</p>`:''}
+  <label class="fld"><span>পাসওয়ার্ড</span><div class="pwbox">
+    <input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button type="button" class="pweye" id="pwEye" onclick="togglePw()" aria-label="পাসওয়ার্ড দেখান">${EYE_OPEN}</button>
+  </div></label>
+  <div class="row" style="margin-top:14px"><button class="btn" style="width:100%" onclick="doLogin()">লগইন</button></div>
+  <p class="loginrecover" onclick="toggleRecover()">পাসওয়ার্ড উদ্ধার</p>
+  <div id="recBox" style="display:none">
+    <label class="fld"><span>পরিচালকের মোবাইল নং</span><input id="rec_mobile" type="tel"></label>
+    <label class="fld"><span>পরিচালকের এনআইডি নম্বর</span><input id="rec_nid" type="text"></label>
+    <div class="row"><button class="btn ghost" style="width:100%" onclick="recoverPassword()">পাসওয়ার্ড দেখুন</button></div>
+    <div id="recResult"></div>
+  </div>
+  </div></div>`;
+}
+function togglePw(){const i=$('#pw'),b=$('#pwEye');if(!i||!b)return;const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=show?EYE_CLOSED:EYE_OPEN;b.setAttribute('aria-label',show?'পাসওয়ার্ড লুকান':'পাসওয়ার্ড দেখান')}
+function toggleRecover(){const b=$('#recBox');if(!b)return;const show=b.style.display==='none';b.style.display=show?'flex':'none';if(show)$('#recResult').innerHTML=''}
+async function recoverPassword(){
+  const mobile=en(v('rec_mobile')),nid=en(v('rec_nid'));
+  if(!mobile||!nid){toast('মোবাইল ও এনআইডি নম্বর দিন');return}
+  busy(true);
+  try{const d=await api('recoverPassword',{mobile,nid});$('#recResult').innerHTML=`<p style="font-weight:700;color:var(--ok);margin:4px 0 0">পাসওয়ার্ড: ${esc(d.password)}</p>`}
+  catch(e){$('#recResult').innerHTML='';toast(e.message||'তথ্য মিলেনি')}
+  finally{busy(false)}
+}
 async function doLogin(){PW=v('pw');if(!PW)return;try{localStorage.setItem('madrasa_pw',PW)}catch(e){}await reload()}
 async function boot(){
-  drawMenu();
+  drawMenu();paintHeader();
   if(typeof CFG==='undefined'||!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0){$('#main').innerHTML='<div class="panel"><h1>সংযোগ সেট করা হয়নি</h1><p>config.js ফাইলে Apps Script Web app-এর লিংক বসান (README দেখুন)।</p></div>';return}
   if(!PW){$('#main').innerHTML=pLogin('');return}
   await reload();
@@ -529,7 +588,7 @@ async function go(page,view,id){
 function render(){
   if(!LOADED)return;
   AFTER=null;const s=DB.settings;
-  $('#brand').innerHTML=(s.logo?`<img src="${s.logo}" alt="">`:'')+esc(s.name||'হিফয মাদরাসা');
+  paintHeader();
   const f=R.view==='form';
   const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,sidc:pStaffIdc,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
   $('#main').innerHTML=map[R.page]();
@@ -1144,7 +1203,7 @@ function pSetup(){
   return `<div class="bar"><h1>প্রতিষ্ঠান সেটাপ</h1></div>
   <div class="panel"><div class="grid">
    ${fld('p_name','প্রতিষ্ঠানের নাম',s.name)}${fld('p_found','প্রতিষ্ঠাকাল (সাল)',s.founded)}
-   ${fld('p_dir','পরিচালকের নাম',s.director)}${fld('p_dmob','পরিচালকের মোবাইল',s.directorMobile,'tel')}${fld('p_head','প্রধান শিক্ষকের নাম',s.headTeacher)}
+   ${fld('p_dir','পরিচালকের নাম',s.director)}${fld('p_dmob','পরিচালকের মোবাইল',s.directorMobile,'tel')}${fld('p_dnid','পরিচালকের এনআইডি নম্বর',s.directorNid)}${fld('p_head','প্রধান শিক্ষকের নাম',s.headTeacher)}
    ${area('p_addr','ঠিকানা',s.address,'full')}
    ${fld('p_fb','Facebook',s.facebook,'text','placeholder="পেজের লিংক"')}${fld('p_yt','YouTube',s.youtube,'text','placeholder="চ্যানেলের লিংক"')}${fld('p_wa','WhatsApp',s.whatsapp,'tel')}
   </div><div class="sec" style="margin-top:18px">লোগো ও স্বাক্ষর</div><div class="grid">${fileBox('p_logo','লোগো',s.logo,200,38000)}${sigBox('p_sig','পরিচালকের স্বাক্ষর',s.directorSig)}</div>
@@ -1155,15 +1214,33 @@ function pSetup(){
   <div class="sec">প্রত্যয়নপত্র ও সার্টিফিকেট ব্যাকগ্রাউন্ড ডিজাইন</div>
   <div class="grid">${fileBox('p_certbg','ব্যাকগ্রাউন্ড ডিজাইন (A4 ল্যান্ডস্কেপ)',s.certBg,1600,900000)}</div>
   <p class="note">এই ছবিটি প্রত্যয়নপত্র ও সার্টিফিকেটের পুরো পাতাজুড়ে ব্যাকগ্রাউন্ড হিসেবে বসবে (ধার/ফ্রেম-সহ ডিজাইন হলে ভালো হয়)।</p>
-  <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>`;
+  <div class="row"><button class="btn" onclick="saveSetup()">সংরক্ষণ করুন</button></div></div>
+  <div class="panel"><div class="sec" style="margin-top:0">লগইন পাসওয়ার্ড পরিবর্তন</div>
+  <p class="note">পরিচালকের মোবাইল ও এনআইডি নম্বর (উপরে) দিয়ে রাখলে লগইন পেজ থেকে "পাসওয়ার্ড উদ্ধার" করা যাবে।</p>
+  <div class="grid">
+   <label class="fld"><span>নতুন পাসওয়ার্ড</span><input id="p_newpw" type="password" autocomplete="new-password"></label>
+   <label class="fld"><span>পুনরায় লিখুন</span><input id="p_newpw2" type="password" autocomplete="new-password"></label>
+  </div>
+  <div class="row"><button class="btn ghost" onclick="changePassword()">পাসওয়ার্ড পরিবর্তন করুন</button></div></div>`;
 }
 function genKey(){return uid()+uid().slice(0,4)}
 async function saveSetup(){
   const ex=DB.settings;
-  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,certBg:FV.p_certbg||'',viewKey:ex.viewKey||genKey()};
+  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),directorNid:en(v('p_dnid')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,certBg:FV.p_certbg||'',viewKey:ex.viewKey||genKey()};
   if(!await work(()=>batch([{op:'upsert',table:'settings',rec}])))return;
   Object.assign(DB.settings,rec,{directorSig:getSig('p_sig')});delete DB.settings.id;
+  try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}
   render();toast('সেটাপ সংরক্ষিত');
+}
+async function changePassword(){
+  const p1=v('p_newpw'),p2=v('p_newpw2');
+  if(!p1){toast('নতুন পাসওয়ার্ড দিন');return}
+  if(p1.length<4){toast('অন্তত ৪ অক্ষরের পাসওয়ার্ড দিন');return}
+  if(p1!==p2){toast('দুইটি পাসওয়ার্ড মিলছে না');return}
+  if(!await work(()=>batch([{op:'upsert',table:'settings',rec:{id:'main',loginPassword:p1}}])))return;
+  PW=p1;try{localStorage.setItem('madrasa_pw',PW)}catch(e){}
+  $('#p_newpw').value='';$('#p_newpw2').value='';
+  toast('পাসওয়ার্ড পরিবর্তন হয়েছে');
 }
 
 /* ================= notices ================= */

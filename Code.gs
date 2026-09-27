@@ -4,9 +4,8 @@
  * সব ডেটা ওই Sheet-এর আলাদা আলাদা ট্যাবে জমা হয়।
  */
 
-// ▼▼ এই পাসওয়ার্ডটি অবশ্যই বদলে নিন ▼▼
-const PASSWORD = 'madrasa123';
-// ▲▲ ------------------------------ ▲▲
+// প্রথমবার লগইন পাসওয়ার্ড এটি — পরে সফটওয়্যারের "প্রতিষ্ঠান সেটাপ" পেজ থেকে বদলানো যাবে
+const DEFAULT_PASSWORD = '12345';
 
 const NAMES = {
   students: 'Students',
@@ -48,16 +47,37 @@ function doPost(e) {
   var out;
   try {
     var p = JSON.parse(e.postData.contents);
-    if (p.key !== PASSWORD) throw new Error('AUTH');
-    var lock = LockService.getScriptLock();
-    lock.waitLock(30000);
-    try { out = { ok: true, data: route(p) }; }
-    finally { lock.releaseLock(); }
+    if (p.action === 'recoverPassword') {
+      // পাসওয়ার্ড ছাড়াই চলে — পরিচালকের মোবাইল ও এনআইডি মিললে তবেই পাসওয়ার্ড ফেরত দেয়
+      out = { ok: true, data: recoverPassword_(p.mobile, p.nid) };
+    } else {
+      if (p.key !== getPassword_()) throw new Error('AUTH');
+      var lock = LockService.getScriptLock();
+      lock.waitLock(30000);
+      try { out = { ok: true, data: route(p) }; }
+      finally { lock.releaseLock(); }
+    }
   } catch (err) {
     out = { ok: false, error: String(err && err.message ? err.message : err) };
   }
   return ContentService.createTextOutput(JSON.stringify(out))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** সেটিংসে সংরক্ষিত পাসওয়ার্ড, না থাকলে ডিফল্ট। */
+function getPassword_() {
+  var st = readTable('settings')[0] || {};
+  return st.loginPassword ? String(st.loginPassword) : DEFAULT_PASSWORD;
+}
+
+/** আইডি কার্ড/সেটাপের মতোই — পরিচালকের মোবাইল ও এনআইডি মিলিয়ে পাসওয়ার্ড উদ্ধার। */
+function recoverPassword_(mobile, nid) {
+  var st = readTable('settings')[0] || {};
+  if (!st.directorMobile || !st.directorNid) throw new Error('পরিচালকের মোবাইল/এনআইডি এখনও সেটাপ করা হয়নি');
+  if (String(mobile || '') !== String(st.directorMobile) || String(nid || '') !== String(st.directorNid)) {
+    throw new Error('মোবাইল বা এনআইডি সঠিক নয়');
+  }
+  return { password: getPassword_() };
 }
 
 function route(p) {
@@ -127,6 +147,7 @@ function listAll() {
   var st = readTable('settings')[0] || {};
   var f = getFiles('settings', 'main');
   Object.keys(f).forEach(function (k) { st[k] = f[k]; });
+  delete st.loginPassword;
   out.settings = st;
   return out;
 }
