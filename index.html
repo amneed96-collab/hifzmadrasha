@@ -124,8 +124,16 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .lh h2{margin:0 0 2px;font-size:30px;line-height:1.25;color:#0A3D62}
 .rc .lh h2{font-size:24px}
 .lh p{margin:0;font-size:12.5px}
+.lh .lhbadge{position:absolute;right:0;top:2px;width:78px;text-align:right;font-weight:700;font-size:11px;letter-spacing:.3px;color:#0A3D62;line-height:1.3}
 .dt{display:table;margin:8px auto;border:1.5px solid #0A3D62;border-radius:4px;padding:3px 26px;font-weight:700;font-size:16px;color:#0A3D62}
 .dmeta{display:flex;justify-content:space-between;margin-bottom:8px}
+.dthead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 10px}
+.dthead .dt{margin:0}
+.dthead .dtl,.dthead .dtr{font-size:12px;white-space:nowrap;flex:1}
+.dthead .dtr{text-align:right}
+.dualwrap .copybody{display:flex;flex-direction:column}
+.dualwrap .copybody>.doc{display:flex;flex-direction:column;flex:1;min-height:0}
+.dualwrap .copybody .sigrow{margin-top:auto;padding-top:12px}
 .dtop{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
 .dtop>div:first-child{flex:1}
 .dtop .kv{margin-bottom:0}
@@ -138,7 +146,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .dh3{font-weight:700;margin:10px 0 4px;color:#0A3D62}
 .sigrow{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
 .sgb{text-align:center;min-width:120px;flex:1}
-.sigimg{height:44px;max-width:150px;display:block;margin:0 auto;object-fit:contain;mix-blend-mode:multiply}
+.sigimg{height:44px;max-width:150px;display:block;margin:0 auto;object-fit:contain;object-position:center bottom;mix-blend-mode:multiply}
 .sgl{border-top:1px solid #000;margin:2px auto 0;padding-top:2px;font-size:12px;width:96px}
 .pb{page-break-before:always;break-before:page}
 .atts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -148,7 +156,7 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 @page pgdual{size:A4 landscape;margin:0}
 #printArea.pgdual{page:pgdual}
 .dualwrap{width:297mm;height:210mm;display:flex}
-.dualwrap .copy{width:148.5mm;height:210mm;box-sizing:border-box;padding:0.5in;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.dualwrap .copy{width:148.5mm;height:210mm;box-sizing:border-box;padding:0.5in 0.5in 0.3in;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .dualwrap .copy .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .dualwrap .copy .wmk.in img{width:45%;max-width:none}
 .dualwrap .copylabel{text-align:center;font-weight:700;font-size:12px;color:#0A3D62;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
@@ -247,19 +255,23 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .cert{padding:0.3in;position:relative;z-index:0;height:100%;display:flex;flex-direction:column;box-sizing:border-box;background-repeat:no-repeat;background-position:center;background-size:100% 100%;color:#000}
 .cert .wmk.in{position:absolute;left:0;top:0;width:100%;height:100%;z-index:-1;display:flex;align-items:center;justify-content:center}
 .cert .wmk.in img{width:38%;max-width:none}
-.cert .lh{margin-bottom:6mm}
+.cert .lh{margin-bottom:6mm;min-height:104px}
+.cert .lh img{left:44px;top:14px}
+.cert .lh .lt{padding:0 132px}
+.cert .lh h2{font-size:40px}
+.cert .lh p{font-size:16px}
 .cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:12mm}
 .cert .chead .csp{flex:1}
 .cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:400;-webkit-text-stroke:0.8px currentColor;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
 .cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
 .cert .cbody{font-size:18px;line-height:2.05;text-align:justify;flex:1;color:#000}
 .cert .cbody b{font-weight:400;-webkit-text-stroke:0.6px currentColor}
-.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14mm;font-size:16px;gap:10mm}
+.cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10mm;margin-bottom:10mm;font-size:16px;gap:10mm}
 .cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
 .cert .csig img{height:50px;display:block;margin:0 auto 4px;mix-blend-mode:multiply}
 .cert .csig .sline{border-top:1px solid #000;margin:0}
-.cert .csig .sgname{font-size:15px;color:#000;font-weight:400;-webkit-text-stroke:0.6px currentColor;white-space:nowrap;margin-top:6px}
-.cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px;border-top:none;padding-top:0}
+.cert .csig .sgname{font-size:15px;color:#000;font-weight:400;-webkit-text-stroke:0.6px currentColor;white-space:nowrap;margin-top:6px;text-align:center}
+.cert .csig .sgl{font-size:16px;color:#000;white-space:nowrap;margin-top:2px;border-top:none;padding-top:0;text-align:center}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -440,7 +452,7 @@ window.addEventListener('resize',()=>{if($('#pprev').classList.contains('show'))
 function closePreview(){$('#pprev').classList.remove('show');$('#pprevPage').innerHTML=''}
 function doPrint(){setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML='';closePreview()});
-function lh(){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
+function lh(badge){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}${badge?`<div class="lhbadge">${esc(badge)}</div>`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
 const sg=(src,label)=>`<div class="sgb">${src&&src!=='@'?`<img class="sigimg" src="${src}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">${label}</div></div>`;
 const kvRows=p=>{let h='';for(let i=0;i<p.length;i+=2){const a=p[i],b=p[i+1];h+=`<tr><th>${a[0]}</th><td>${a[1]||'&nbsp;'}</td>${b?`<th>${b[0]}</th><td>${b[1]||'&nbsp;'}</td>`:'<td colspan="2"></td>'}</tr>`}return h};
 function siteFooter(){const s=DB.settings;
@@ -710,16 +722,16 @@ async function saveFee(){
   toast('রশিদ সংরক্ষিত');go('fee');
 }
 async function delFee(id){if(!await ask('এই রশিদটি মুছে ফেলবেন?'))return;if(!await work(()=>batch([{op:'delete',table:'collections',id}])))return;DB.collections=DB.collections.filter(c=>c.id!==id);render();toast('মুছে ফেলা হয়েছে')}
-function receiptDoc(c){
+function receiptDoc(c,badge){
   const s=DB.students.find(x=>x.id===c.studentId)||{name:'',sid:'',dept:'',type:''};
-  return `<div class="doc rc">${lh()}<div class="dt">ফি আদায় রশিদ</div>
-  <div class="dmeta"><div>রশিদ নং: <b>${bn(c.receiptNo)}</b></div><div>তারিখ: <b>${fdate(c.date)}</b></div></div>
+  return `<div class="doc rc">${lh(badge)}<div class="dthead"><div class="dtl">রশিদ নং: <b>${bn(c.receiptNo)}</b></div><div class="dt">ফি আদায় রশিদ</div><div class="dtr">তারিখ: <b>${fdate(c.date)}</b></div></div>
   <table class="kv">${kvRows([['নাম',esc(s.name)],['আইডি',bn(s.sid)],['বিভাগ',s.dept],['ধরণ',s.type],['ভর্তি',fmonth((s.admDate||'').slice(0,7))],['হিসাব পর্যন্ত',fmonth(c.month)]])}</table>
   <table class="kv"><tr><th>খাত</th><th class="n">মোট প্রাপ্য</th><th class="n">পূর্বে পরিশোধ</th><th class="n">বকেয়া</th><th class="n">পরিশোধ</th><th class="n">অবশিষ্ট</th></tr>${c.lines.map(l=>`<tr><td>${esc(l.head)}</td><td class="n">${l.total!=null?tk(l.total):''}</td><td class="n">${l.prev!=null?tk(l.prev):''}</td><td class="n">${tk(l.due)}</td><td class="n">${tk(l.paid)}</td><td class="n">${tk(l.due-l.paid)}</td></tr>`).join('')}<tr><th>মোট</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.total||0),0))}</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.prev||0),0))}</th><th class="n">${tk(c.totalDue)}</th><th class="n">${tk(c.totalPaid)}</th><th class="n">${tk(c.remaining)}</th></tr></table>
   ${c.note?`<div>মন্তব্য: ${esc(c.note)}</div>`:''}
   <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
 }
-async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printDual(receiptDoc(c),'অফিস কপি','শিক্ষার্থী কপি')}catch(e){handleErr(e)}}
+async function printRc(id){try{const c=await hydrate('collections',DB.collections.find(x=>x.id===id));printHTML(`<div class="dualwrap">${dualPane(receiptDoc(c,'অফিস কপি'))}${dualPane(receiptDoc(c,'শিক্ষার্থী কপি'))}</div>`,{dual:true,nowm:true})}catch(e){handleErr(e)}}
+function dualPane(bodyHTML){return `<div class="copy">${wmIn()}<div class="copybody">${bodyHTML}</div><div class="copyfoot"><div class="dashline"></div><div class="credit-fixed">${CREDIT}</div></div></div>`}
 async function shareRc(id){
   let c;try{c=await hydrate('collections',DB.collections.find(x=>x.id===id))}catch(e){return handleErr(e)}
   shareDoc(boxed(receiptDoc(c)),'receipt-'+c.receiptNo+'.png','ফি রশিদ',640,true);
