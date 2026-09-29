@@ -7,7 +7,8 @@
 <title>হিফয মাদরাসা ব্যবস্থাপনা</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"></noscript>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 <script src="config.js"></script>
@@ -267,8 +268,8 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:600;color:var(--deep)
 .cert .chead{display:flex;align-items:baseline;gap:10mm;margin-bottom:12mm}
 .cert .chead .csp{flex:1}
 .cert .chead .ctitle{flex:2;text-align:center;font-size:28px;font-weight:400;-webkit-text-stroke:0.8px currentColor;color:#000;text-decoration:underline;text-underline-offset:5px;margin:0}
-.cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap}
-.cert .cbody{font-size:18px;line-height:2.05;text-align:justify;flex:1;color:#000}
+.cert .chead .cmeta{flex:1;text-align:right;font-size:16px;color:#000;margin:0;white-space:nowrap;padding-right:30px}
+.cert .cbody{font-size:20px;line-height:2.05;text-align:justify;flex:1;color:#000;padding-left:30px;padding-right:30px}
 .cert .cbody b{font-weight:400;-webkit-text-stroke:0.6px currentColor}
 .cert .cfoot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10mm;margin-bottom:10mm;font-size:16px;gap:10mm}
 .cert .csig{text-align:center;min-width:170px;flex:1;max-width:250px}
@@ -322,6 +323,7 @@ const $=s=>document.querySelector(s);
 const BND='০১২৩৪৫৬৭৮৯';
 const bn=v=>String(v==null?'':v).replace(/\d/g,d=>BND[d]);
 const en=s=>String(s||'').replace(/[০-৯]/g,d=>BND.indexOf(d));
+const instMob=s=>en((s&&(s.mobile||s.whatsapp))||'');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const MONTHS=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const DEPTS=['কায়দা','নাজেরা','হিফয','শুনানি'];
@@ -349,7 +351,7 @@ const busy=on=>$('#busy').classList.toggle('show',!!on);
 const setStat=t=>{const e=$('#stat');if(e)e.textContent=t};
 
 /* ================= data + Google Sheet API ================= */
-const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorNid:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
+const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorNid:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',email:'',mobile:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
 let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
 const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created','ts']);
@@ -362,15 +364,40 @@ function norm(rec){for(const k in rec){const x=rec[k];
   return rec}
 const wireK=(o,ex,fields)=>{const w=Object.assign({},o);delete w._full;(fields||[]).forEach(f=>{w[f]=keep(ex,f,o[f])});return w};
 const keep=(ex,k,val)=>ex&&ex[k]&&ex[k]===val?'@':val;
+function badReply(t){
+  if(/accounts\.google\.com|ServiceLogin|signin/i.test(t))return Object.assign(new Error('Apps Script লগইন চাইছে — ডিপ্লয়ের সময় “Who has access” অবশ্যই Anyone দিন (Anyone with Google account নয়) এবং New version দিয়ে আবার Deploy করুন'),{app:true});
+  const m=/<title>([^<]*)<\/title>/i.exec(t);
+  return new Error('সার্ভার থেকে ভুল উত্তর এসেছে'+(m?' ('+m[1].trim().slice(0,60)+')':''));
+}
 async function api(action,payload){
-  const r=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({key:PW,action},payload||{}))});
-  const j=await r.json();if(!j.ok)throw new Error(j.error||'ERR');return j.data;
+  const body=JSON.stringify(Object.assign({key:PW,action},payload||{}));
+  const READ=action==='list'||action==='getFiles'||action==='ping';
+  const tries=READ?3:2;let last;
+  for(let i=0;i<tries;i++){
+    const ac=typeof AbortController!=='undefined'?new AbortController():null;
+    const to=ac?setTimeout(()=>ac.abort(),45000):0;
+    try{
+      let r;
+      if(READ&&i===2)r=await fetch(CFG.API_URL+'?q='+encodeURIComponent(btoa(unescape(encodeURIComponent(body)))),{cache:'no-store',credentials:'omit',signal:ac&&ac.signal});
+      else r=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body,cache:'no-store',credentials:'omit',signal:ac&&ac.signal});
+      const t=await r.text();let j;
+      try{j=JSON.parse(t)}catch(e){throw badReply(t)}
+      if(!j.ok)throw Object.assign(new Error(j.error||'ERR'),{app:true});
+      return j.data;
+    }catch(e){
+      if(e.app)throw e;
+      last=e.name==='AbortError'?new Error('সার্ভার সাড়া দিচ্ছে না — ইন্টারনেট দেখে আবার চেষ্টা করুন'):e;
+      if(i<tries-1)await new Promise(r=>setTimeout(r,700*(i+1)));
+    }finally{if(to)clearTimeout(to)}
+  }
+  throw last;
 }
 const batch=ops=>api('batch',{ops});
 const seqOp=patch=>({op:'upsert',table:'settings',rec:{id:'main',seq:Object.assign({},DB.seq,patch)}});
-async function work(fn){busy(true);try{await fn();setStat('');return true}catch(e){handleErr(e);return false}finally{busy(false)}}
+let WVER=0;
+async function work(fn){WVER++;busy(true);try{await fn();setStat('');return true}catch(e){handleErr(e);return false}finally{busy(false)}}
 function handleErr(e){if(String(e.message)==='AUTH'){logout('পাসওয়ার্ড ভুল বা বদলে গেছে');return}toast('সংযোগ ব্যর্থ: '+(e.message||e));setStat('সংযোগ নেই')}
-function logout(msg){$('#foot').innerHTML='';PW='';try{localStorage.removeItem('madrasa_pw')}catch(e){}LOADED=false;$('#main').innerHTML=pLogin(msg||'')}
+function logout(msg){$('#foot').innerHTML='';PW='';try{localStorage.removeItem('madrasa_pw');localStorage.removeItem(CK)}catch(e){}LOADED=false;$('#main').innerHTML=pLogin(msg||'')}
 async function hydrate(table,rec){
   if(!rec||rec._full)return rec;
   const HEAVY=['sigStu','sigGua','sigHead','sigDir','birthCert','fNid','mNid','sig','dirSig','sigCash','sigRec'];
@@ -378,24 +405,35 @@ async function hydrate(table,rec){
   if(need.length){busy(true);try{const f=await api('getFiles',{table,id:rec.id});need.forEach(k=>{rec[k]=f[k]||''})}finally{busy(false)}}
   rec._full=true;return rec;
 }
-async function reload(){
-  busy(true);setStat('লোড হচ্ছে…');
-  try{
-    const d=await api('list');
-    ['students','collections','feeRules','staff','salaries','expenses','notices','certificates'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
+const CK='madrasa_cache_v1';
+function cacheSave(d){try{localStorage.setItem(CK,JSON.stringify(d))}catch(e){try{localStorage.removeItem(CK)}catch(_){}}}
+function cacheLoad(){try{const s=localStorage.getItem(CK);return s?JSON.parse(s):null}catch(e){return null}}
+function applyList(d){
+  ['students','collections','feeRules','staff','salaries','expenses','notices','certificates'].forEach(t=>{DB[t]=(d[t]||[]).map(norm)});
     const st=norm(d.settings||{});const sq=st.seq||{};delete st.seq;delete st.id;
     DB.settings=Object.assign(defDB().settings,st);
     if(!DB.settings.pledge)DB.settings.pledge=PLEDGE;if(!DB.settings.approval)DB.settings.approval=APPROVAL;
     const mx=(a,f)=>a.reduce((t,x)=>Math.max(t,+x[f]||0),0);
     DB.seq={form:Math.max(+sq.form||0,mx(DB.students,'formNo')),receipt:Math.max(+sq.receipt||0,mx(DB.collections,'receiptNo')),staff:Math.max(+sq.staff||0,DB.staff.reduce((t,x)=>Math.max(t,+String(x.tid).replace(/\D/g,'')||0),0)),voucher:Math.max(+sq.voucher||0,mx(DB.expenses,'no')),salary:Math.max(+sq.salary||0,mx(DB.salaries,'no'))};
-    LOADED=true;setStat('');
-    try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}
-    R={page:'dash',view:'list',id:null};render();
+  LOADED=true;
+  try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}
+}
+async function reload(silent){
+  if(!silent)busy(true);
+  setStat(silent?'হালনাগাদ হচ্ছে…':'লোড হচ্ছে…');
+  const v0=WVER;
+  try{
+    const d=await api('list');
+    if(silent&&WVER!==v0){setStat('');return}
+    cacheSave(d);applyList(d);setStat('');
+    if(silent){const a=document.activeElement;if(R.view==='list'&&!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))render();else paintHeader()}
+    else{R={page:'dash',view:'list',id:null};render()}
   }catch(e){
-    LOADED=false;
-    if(String(e.message)==='AUTH')logout('পাসওয়ার্ড ভুল');
-    else{setStat('সংযোগ নেই');$('#main').innerHTML=`<div class="panel"><h1>সংযোগ করা যায়নি</h1><p>${esc(e.message||e)}</p><p class="note">config.js-এ লিংক ঠিক আছে কিনা এবং Apps Script “Anyone” অ্যাক্সেসে ডিপ্লয় করা আছে কিনা দেখুন।</p><div class="row"><button class="btn" onclick="reload()">আবার চেষ্টা করুন</button></div></div>`}
-  }finally{busy(false)}
+    if(String(e.message)==='AUTH'){logout('পাসওয়ার্ড ভুল');return}
+    if(silent){setStat('অফলাইন — সংরক্ষিত তথ্য দেখানো হচ্ছে');return}
+    LOADED=false;setStat('সংযোগ নেই');
+    $('#main').innerHTML=`<div class="panel"><h1>সংযোগ করা যায়নি</h1><p>${esc(e.message||e)}</p><p class="note">config.js-এ লিংক ঠিক আছে কিনা এবং Apps Script “Anyone” অ্যাক্সেসে ডিপ্লয় করা আছে কিনা দেখুন।</p><div class="row"><button class="btn" onclick="reload()">আবার চেষ্টা করুন</button></div></div>`;
+  }finally{if(!silent)busy(false)}
 }
 const EYE_OPEN='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_CLOSED='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.8 21.8 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
@@ -443,6 +481,9 @@ async function boot(){
   drawMenu();paintHeader();
   if(typeof CFG==='undefined'||!CFG.API_URL||CFG.API_URL.indexOf('PASTE')>=0){$('#main').innerHTML='<div class="panel"><h1>সংযোগ সেট করা হয়নি</h1><p>config.js ফাইলে Apps Script Web app-এর লিংক বসান (README দেখুন)।</p></div>';return}
   if(!PW){$('#main').innerHTML=pLogin('');return}
+  const c=cacheLoad();
+  if(c&&c.settings){try{applyList(c);R={page:'dash',view:'list',id:null};render();paintHeader();reload(true);return}catch(e){}}
+  $('#main').innerHTML='<div class="panel"><p>লোড হচ্ছে…</p></div>';
   await reload();
 }
 
@@ -513,14 +554,12 @@ window.addEventListener('resize',()=>{if($('#pprev').classList.contains('show'))
 function closePreview(){$('#pprev').classList.remove('show');$('#pprevPage').innerHTML=''}
 function doPrint(){setTimeout(()=>{try{window.print()}catch(e){toast('প্রিন্ট চালু করা যায়নি')}},80)}
 window.addEventListener('afterprint',()=>{$('#printArea').innerHTML='';closePreview()});
-function lh(badge){const s=DB.settings;const c=[s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),s.whatsapp&&'WhatsApp: '+bn(s.whatsapp)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}${badge?`<div class="lhbadge">${esc(badge)}</div>`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
+function lh(badge){const s=DB.settings;const c=[s.email&&esc(s.email),instMob(s)].filter(Boolean).join(' | ');const l1=[s.founded&&'প্রতিষ্ঠাকাল: '+bn(s.founded),s.address&&esc(s.address)].filter(Boolean).join(' &nbsp;|&nbsp; ');return `<div class="lh">${s.logo?`<img src="${s.logo}" alt="">`:''}${badge?`<div class="lhbadge">${esc(badge)}</div>`:''}<div class="lt"><h2>${esc(s.name||'প্রতিষ্ঠানের নাম')}</h2>${l1?`<p>${l1}</p>`:''}${c?`<p>${c}</p>`:''}</div></div>`}
 const sg=(src,label)=>`<div class="sgb">${src&&src!=='@'?`<img class="sigimg" src="${src}" alt="">`:'<div class="sigimg"></div>'}<div class="sgl">${label}</div></div>`;
 const kvRows=p=>{let h='';for(let i=0;i<p.length;i+=2){const a=p[i],b=p[i+1];h+=`<tr><th>${a[0]}</th><td>${a[1]||'&nbsp;'}</td>${b?`<th>${b[0]}</th><td>${b[1]||'&nbsp;'}</td>`:'<td colspan="2"></td>'}</tr>`}return h};
 function siteFooter(){const s=DB.settings;
   const lk=(u,tx)=>u?(/^https?:\/\//i.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${tx}</a>`:`${tx}: ${esc(u)}`):'';
-  let wn=en(s.whatsapp||'').replace(/\D/g,'');if(wn.startsWith('0'))wn='88'+wn;
-  const wa=wn?`<a href="https://wa.me/${wn}" target="_blank" rel="noopener">WhatsApp: ${bn(s.whatsapp)}</a>`:'';
-  const left=[s.address&&esc(s.address),s.directorMobile&&'মোবাইল: '+bn(s.directorMobile),wa].filter(Boolean).map(x=>`<div>${x}</div>`).join('');
+  const left=[s.address&&esc(s.address),[s.email&&esc(s.email),instMob(s)].filter(Boolean).join(' | ')].filter(Boolean).map(x=>`<div>${x}</div>`).join('');
   const right=[lk(s.facebook,'Facebook'),lk(s.youtube,'YouTube')].filter(Boolean).map(x=>`<div>${x}</div>`).join('');
   return `<div class="fw"><div class="fl"><b>${esc(s.name||'')}</b>${left}</div><div class="fr">${right}</div></div><div class="cr">${CREDIT}</div>`}
 
@@ -628,7 +667,7 @@ function fillStu(){
   const q=en(v('q').toLowerCase()),fd=v('fd'),ft=v('ft');
   const rows=DB.students.filter(s=>(!fd||s.dept===fd)&&(!ft||s.type===ft)&&(!q||[s.name,s.sid,s.fMobile,s.mMobile,s.gMobile].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.formNo-a.formNo);
   $('#cnt').textContent='মোট '+bn(rows.length)+' জন';
-  $('#tb').innerHTML=rows.map(s=>`<tr><td>${bn(s.sid)}</td><td>${s.photo?`<img class="th" src="${s.photo}" alt="">`:''}</td><td>${esc(s.name)}</td><td>${s.dept}</td><td>${s.type}</td><td>${bn(s.gMobile||s.fMobile||'')}</td>
+  $('#tb').innerHTML=rows.map(s=>`<tr><td>${bn(s.sid)}</td><td>${s.photo?`<img class="th" src="${s.photo}" alt="">`:''}</td><td>${esc(s.name)}</td><td>${s.dept}</td><td>${s.type}</td><td>${en(s.gMobile||s.fMobile||'')}</td>
   <td><div class="acts"><button class="btn sm ghost" onclick="go('stu','form','${s.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printStu('${s.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delStu('${s.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">কোনো শিক্ষার্থী নেই। “নতুন ভর্তি” চাপুন।</td></tr>`;
 }
 const mkSid=(date,fn)=>String(date||today()).slice(2,4)+pad(fn,3);
@@ -705,7 +744,7 @@ function admissionDoc(s){
   return `<div class="doc">${lh()}<div class="dt">ভর্তি ফরম</div>
   <div class="dmeta"><div>ফরম নং: <b>${bn(s.formNo)}</b></div><div>আইডি: <b>${bn(s.sid)}</b></div><div>ভর্তির তারিখ: <b>${fdate(s.admDate)}</b></div></div>
   <div class="dtop"><div><table class="kv">${kvRows([['বিভাগ',s.dept],['ধরণ',s.type],['নাম',esc(s.name)],['জন্ম তারিখ',fdate(s.dob)],['বয়স',age(s.dob)],['রক্তের গ্রুপ',esc(s.blood)]])}</table></div><div class="dphoto">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div></div>
-  <table class="kv"><tr><th></th><th>নাম</th><th>পেশা / সম্পর্ক</th><th>মোবাইল</th></tr><tr><th>পিতা</th><td>${esc(s.fName)}</td><td>${esc(s.fJob)}</td><td>${bn(s.fMobile)}</td></tr><tr><th>মাতা</th><td>${esc(s.mName)}</td><td>${esc(s.mJob)}</td><td>${bn(s.mMobile)}</td></tr><tr><th>অভিভাবক</th><td>${esc(s.gName)}</td><td>${esc(s.gRel)}</td><td>${bn(s.gMobile)}</td></tr></table>
+  <table class="kv"><tr><th></th><th>নাম</th><th>পেশা / সম্পর্ক</th><th>মোবাইল</th></tr><tr><th>পিতা</th><td>${esc(s.fName)}</td><td>${esc(s.fJob)}</td><td>${en(s.fMobile)}</td></tr><tr><th>মাতা</th><td>${esc(s.mName)}</td><td>${esc(s.mJob)}</td><td>${en(s.mMobile)}</td></tr><tr><th>অভিভাবক</th><td>${esc(s.gName)}</td><td>${esc(s.gRel)}</td><td>${en(s.gMobile)}</td></tr></table>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(s.permAddr)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(s.presAddr)}</td></tr></table>
   <div class="dh3">অঙ্গীকারনামা</div><div>${esc(st.pledge)} ${s.pledge?'<b>(সম্মত)</b>':''}</div>
   <div class="sigrow">${sg(s.sigStu,'শিক্ষার্থীর স্বাক্ষর')}${sg(s.sigGua,'অভিভাবকের স্বাক্ষর')}</div>
@@ -847,9 +886,9 @@ function idCard(s){
   const addr=same?(s.permAddr||s.presAddr?row('ঠিকানা',esc(s.permAddr||s.presAddr)):''):row('স্থায়ী',esc(s.permAddr))+row('বর্তমান',esc(s.presAddr));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(s.name)}</div>
-  <table class="kvc">${row('আইডি',bn(s.sid))}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',bn(s.gMobile||s.fMobile||''))}</table></div>
+  <table class="kvc">${row('আইডি',bn(s.sid))}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',en(s.gMobile||s.fMobile||''))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
-  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
+  <div class="if">${st.directorMobile?'যোগাযোগ: '+en(instMob(st)||st.directorMobile):'&nbsp;'}</div></div>
   <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে হিসাব দেখুন</div></div>`:''}</div>
   <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
 }
@@ -874,9 +913,9 @@ function staffIdCard(t){
   const addr=same?(t.perm||t.pres?row('ঠিকানা',esc(t.perm||t.pres)):''):row('স্থায়ী',esc(t.perm))+row('বর্তমান',esc(t.pres));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(t.name)}</div>
-  <table class="kvc">${row('আইডি',bn(t.tid))}${row('পদবি',esc(t.desig))}${row('মোবাইল',bn(t.mobile))}</table></div>
+  <table class="kvc">${row('আইডি',bn(t.tid))}${row('পদবি',esc(t.desig))}${row('মোবাইল',en(t.mobile))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
-  <div class="if">${st.directorMobile?'যোগাযোগ: '+bn(st.directorMobile):'&nbsp;'}</div></div>
+  <div class="if">${st.directorMobile?'যোগাযোগ: '+en(instMob(st)||st.directorMobile):'&nbsp;'}</div></div>
   <div class="idc">${wm}${head}<div class="bd"><div class="bh">ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে বেতনের হিসাব দেখুন</div></div>`:''}</div>
   <div class="if back"><div>এই কার্ডটি প্রতিষ্ঠানের সম্পত্তি। হারিয়ে গেলে উপরের ঠিকানায় যোগাযোগ করুন।</div><div class="cr">${CREDIT}</div></div></div></div>`;
 }
@@ -891,7 +930,7 @@ function stfList(){
 function fillStf(){
   const q=en(v('q').toLowerCase());const rows=DB.staff.filter(t=>!q||[t.name,t.tid,t.mobile].join(' ').toLowerCase().includes(q));
   $('#cnt').textContent='মোট '+bn(rows.length)+' জন';
-  $('#tb').innerHTML=rows.map(t=>`<tr><td>${bn(t.tid)}</td><td>${t.photo?`<img class="th" src="${t.photo}" alt="">`:''}</td><td>${esc(t.name)}</td><td>${esc(t.desig)}</td><td>${bn(t.mobile)}</td><td class="n">${tk(t.salary)}</td>
+  $('#tb').innerHTML=rows.map(t=>`<tr><td>${bn(t.tid)}</td><td>${t.photo?`<img class="th" src="${t.photo}" alt="">`:''}</td><td>${esc(t.name)}</td><td>${esc(t.desig)}</td><td>${en(t.mobile)}</td><td class="n">${tk(t.salary)}</td>
   <td><div class="acts"><button class="btn sm ghost" onclick="go('stf','form','${t.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printStf('${t.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delStf('${t.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">কেউ নেই। “নতুন জয়েন” চাপুন।</td></tr>`;
 }
 function stfForm(){
@@ -925,7 +964,7 @@ async function delStf(id){const t=DB.staff.find(x=>x.id===id);if(!await ask(`“
 async function printStf(id){
   let t;try{t=await hydrate('staff',DB.staff.find(x=>x.id===id))}catch(e){return handleErr(e)}
   printHTML(`<div class="doc">${lh()}<div class="dt">শিক্ষক ও কর্মচারী জয়েন ফরম</div><div class="dmeta"><div>আইডি: <b>${bn(t.tid)}</b></div><div>জয়েনের তারিখ: <b>${fdate(t.joinDate)}</b></div></div>
-  <div class="dtop"><div><table class="kv">${kvRows([['নাম',esc(t.name)],['পিতার নাম',esc(t.father)],['জন্ম তারিখ',fdate(t.dob)],['পদবি',esc(t.desig)],['যোগ্যতা',esc(t.edu)],['এনআইডি',bn(t.nid)],['মোবাইল',bn(t.mobile)],['মাসিক বেতন',tk(t.salary)]])}</table></div><div class="dphoto">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div></div>
+  <div class="dtop"><div><table class="kv">${kvRows([['নাম',esc(t.name)],['পিতার নাম',esc(t.father)],['জন্ম তারিখ',fdate(t.dob)],['পদবি',esc(t.desig)],['যোগ্যতা',esc(t.edu)],['এনআইডি',bn(t.nid)],['মোবাইল',en(t.mobile)],['মাসিক বেতন',tk(t.salary)]])}</table></div><div class="dphoto">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div></div>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(t.perm)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(t.pres)}</td></tr></table>
   <div class="sigrow">${sg(t.sig,'কর্মীর স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
@@ -1205,7 +1244,7 @@ function pSetup(){
    ${fld('p_name','প্রতিষ্ঠানের নাম',s.name)}${fld('p_found','প্রতিষ্ঠাকাল (সাল)',s.founded)}
    ${fld('p_dir','পরিচালকের নাম',s.director)}${fld('p_dmob','পরিচালকের মোবাইল',s.directorMobile,'tel')}${fld('p_dnid','পরিচালকের এনআইডি নম্বর',s.directorNid)}${fld('p_head','প্রধান শিক্ষকের নাম',s.headTeacher)}
    ${area('p_addr','ঠিকানা',s.address,'full')}
-   ${fld('p_fb','Facebook',s.facebook,'text','placeholder="পেজের লিংক"')}${fld('p_yt','YouTube',s.youtube,'text','placeholder="চ্যানেলের লিংক"')}${fld('p_wa','WhatsApp',s.whatsapp,'tel')}
+   ${fld('p_fb','Facebook',s.facebook,'text','placeholder="পেজের লিংক"')}${fld('p_yt','YouTube',s.youtube,'text','placeholder="চ্যানেলের লিংক"')}${fld('p_mob','প্রতিষ্ঠানের মোবাইল নং',s.mobile||s.whatsapp,'tel')}${fld('p_email','ইমেইল',s.email,'email')}
   </div><div class="sec" style="margin-top:18px">লোগো ও স্বাক্ষর</div><div class="grid">${fileBox('p_logo','লোগো',s.logo,200,38000)}${sigBox('p_sig','পরিচালকের স্বাক্ষর',s.directorSig)}</div>
   <div class="sec">ভর্তি ফরমের লেখা</div><div class="grid">
    ${area('p_pl','অঙ্গীকারনামা',s.pledge,'full',5)}
@@ -1226,7 +1265,7 @@ function pSetup(){
 function genKey(){return uid()+uid().slice(0,4)}
 async function saveSetup(){
   const ex=DB.settings;
-  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),directorNid:en(v('p_dnid')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),whatsapp:en(v('p_wa')),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,certBg:FV.p_certbg||'',viewKey:ex.viewKey||genKey()};
+  const rec={id:'main',name:v('p_name'),founded:en(v('p_found')),director:v('p_dir'),directorMobile:en(v('p_dmob')),directorNid:en(v('p_dnid')),headTeacher:v('p_head'),address:v('p_addr'),facebook:v('p_fb'),youtube:v('p_yt'),mobile:en(v('p_mob')),email:v('p_email'),logo:FV.p_logo||'',directorSig:keep(ex,'directorSig',getSig('p_sig')),pledge:v('p_pl')||PLEDGE,approval:v('p_ap')||APPROVAL,certBg:FV.p_certbg||'',viewKey:ex.viewKey||genKey()};
   if(!await work(()=>batch([{op:'upsert',table:'settings',rec}])))return;
   Object.assign(DB.settings,rec,{directorSig:getSig('p_sig')});delete DB.settings.id;
   try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}

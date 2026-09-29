@@ -40,6 +40,18 @@ function doGet(e) {
       .setTitle('হিসাব')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
+  if (p.q) {  // মোবাইল ব্রাউজারের জন্য ফলব্যাক: শুধু পড়ার অনুরোধ
+    var out;
+    try {
+      var req = JSON.parse(Utilities.newBlob(Utilities.base64Decode(p.q)).getDataAsString('UTF-8'));
+      if (['list', 'getFiles', 'ping'].indexOf(req.action) < 0) throw new Error('অবৈধ অনুরোধ');
+      if (req.key !== getPassword_()) throw new Error('AUTH');
+      out = { ok: true, data: route(req) };
+    } catch (err) {
+      out = { ok: false, error: String(err && err.message ? err.message : err) };
+    }
+    return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+  }
   return ContentService.createTextOutput('মাদরাসা ব্যাকএন্ড চালু আছে');
 }
 
@@ -52,10 +64,14 @@ function doPost(e) {
       out = { ok: true, data: recoverPassword_(p.mobile, p.nid) };
     } else {
       if (p.key !== getPassword_()) throw new Error('AUTH');
-      var lock = LockService.getScriptLock();
-      lock.waitLock(30000);
-      try { out = { ok: true, data: route(p) }; }
-      finally { lock.releaseLock(); }
+      if (p.action === 'list' || p.action === 'getFiles' || p.action === 'ping') {
+        out = { ok: true, data: route(p) };   // পড়ার জন্য লক লাগে না — দ্রুত সাড়া
+      } else {
+        var lock = LockService.getScriptLock();
+        lock.waitLock(30000);
+        try { out = { ok: true, data: route(p) }; }
+        finally { lock.releaseLock(); }
+      }
     }
   } catch (err) {
     out = { ok: false, error: String(err && err.message ? err.message : err) };
@@ -225,17 +241,24 @@ function delFilesWhere(pred) {
   }
 }
 function getFiles(t, id) {
+  // আগে শুধু key কলাম পড়ে নিই, তারপর কেবল দরকারি সারিগুলো — পুরো Files শীট আর পড়া হয় না
   var s = filesSheet(), last = s.getLastRow(), out = {};
   if (last < 2) return out;
-  var v = s.getRange(2, 1, last - 1, 3).getValues(), prefix = t + ':' + id + ':', parts = {};
-  v.forEach(function (r) {
-    var k = String(r[0]);
-    if (k.indexOf(prefix) !== 0) return;
-    var f = k.slice(prefix.length);
-    (parts[f] = parts[f] || []).push([Number(r[1]), String(r[2])]);
-  });
+  var keys = s.getRange(2, 1, last - 1, 1).getValues(), prefix = t + ':' + id + ':', rows = [];
+  for (var i = 0; i < keys.length; i++) if (String(keys[i][0]).indexOf(prefix) === 0) rows.push(i + 2);
+  if (!rows.length) return out;
+  var parts = {}, a = 0;
+  while (a < rows.length) {
+    var b = a;
+    while (b + 1 < rows.length && rows[b + 1] === rows[b] + 1) b++;
+    s.getRange(rows[a], 1, rows[b] - rows[a] + 1, 3).getValues().forEach(function (r) {
+      var f = String(r[0]).slice(prefix.length);
+      (parts[f] = parts[f] || []).push([Number(r[1]), String(r[2])]);
+    });
+    a = b + 1;
+  }
   Object.keys(parts).forEach(function (f) {
-    out[f] = parts[f].sort(function (a, b) { return a[0] - b[0]; })
+    out[f] = parts[f].sort(function (x, y) { return x[0] - y[0]; })
       .map(function (x) { return x[1]; }).join('');
   });
   return out;
