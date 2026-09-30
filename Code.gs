@@ -356,6 +356,16 @@ function statusShell_() {
   return { page: page, headHTML: headHTML, st: st };
 }
 
+function pad3_(n) { n = String(n); while (n.length < 3) n = '0' + n; return n; }
+function stuSid_(s, st) {
+  var y = String(st.founded || '').replace(/\D/g, '') || String(s.admDate || '').slice(0, 4);
+  return s.formNo ? 'STU' + y + pad3_(s.formNo) : String(s.sid);
+}
+function stfTid_(t, st) {
+  var y = String(st.founded || '').replace(/\D/g, '');
+  var n = t.tno || (/^\u09B8/.test(String(t.tid)) ? String(t.tid).replace(/\D/g, '') : '');
+  return y && n ? 'IN' + y + pad3_(+n) : String(t.tid);
+}
 function studentStatusPage(sid, key) {
   var shell = statusShell_(), page = shell.page, headHTML = shell.headHTML, st = shell.st;
 
@@ -364,7 +374,7 @@ function studentStatusPage(sid, key) {
 
   var students = readTable('students');
   var s = null;
-  for (var i = 0; i < students.length; i++) { if (String(students[i].sid) === String(sid)) { s = students[i]; break; } }
+  for (var i = 0; i < students.length; i++) { if (String(students[i].sid) === String(sid) || stuSid_(students[i], st) === String(sid)) { s = students[i]; break; } }
   if (!s) return page(headHTML + '<div class="bd"><div class="warn">এই আইডির শিক্ষার্থী পাওয়া যায়নি</div></div>');
 
   var rules = readTable('feeRules').map(function (r) { r.history = parseJSONArr_(r.history); return r; });
@@ -380,7 +390,7 @@ function studentStatusPage(sid, key) {
   }).join('');
 
 
-  var info = '<table><tr><th>আইডি</th><td>' + bnD(s.sid) + '</td></tr>' +
+  var info = '<table><tr><th>আইডি</th><td>' + escH(stuSid_(s, st)) + '</td></tr>' +
     '<tr><th>নাম</th><td>' + escH(s.name) + '</td></tr>' +
     '<tr><th>বিভাগ</th><td>' + escH(s.dept) + ' (' + escH(s.type) + ')</td></tr>' +
     '<tr><th>অভিভাবক</th><td>' + escH(s.gName || s.fName || '') + (s.gMobile || s.fMobile ? ' — ' + bnD(s.gMobile || s.fMobile) : '') + '</td></tr>' +
@@ -406,7 +416,7 @@ function staffStatusPage(tid, key) {
 
   var staffRows = readTable('staff');
   var t = null;
-  for (var i = 0; i < staffRows.length; i++) { if (String(staffRows[i].tid) === String(tid)) { t = staffRows[i]; break; } }
+  for (var i = 0; i < staffRows.length; i++) { if (String(staffRows[i].tid) === String(tid) || stfTid_(staffRows[i], st) === String(tid)) { t = staffRows[i]; break; } }
   if (!t) return page(headHTML + '<div class="bd"><div class="warn">এই আইডির কর্মী পাওয়া যায়নি</div></div>');
 
   var salaries = readTable('salaries').filter(function (x) { return x.staffId === t.id; });
@@ -422,7 +432,7 @@ function staffStatusPage(tid, key) {
     return '<tr><td>' + fmonthH(x.month) + '</td><td>' + fdateH(x.date) + '</td><td class="n">' + tkH(x.paid) + '</td></tr>';
   }).join('');
 
-  var info = '<table><tr><th>আইডি</th><td>' + bnD(t.tid) + '</td></tr>' +
+  var info = '<table><tr><th>আইডি</th><td>' + escH(stfTid_(t, st)) + '</td></tr>' +
     '<tr><th>নাম</th><td>' + escH(t.name) + '</td></tr>' +
     '<tr><th>পদবি</th><td>' + escH(t.desig) + '</td></tr>' +
     '<tr><th>মাসিক বেতন</th><td>' + tkH(t.salary) + '</td></tr>' +

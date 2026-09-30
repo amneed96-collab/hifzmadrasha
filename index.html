@@ -364,7 +364,7 @@ const setStat=t=>{const e=$('#stat');if(e)e.textContent=t};
 const defDB=()=>({settings:{name:'',logo:'',founded:'',director:'',directorMobile:'',directorNid:'',directorSig:'',headTeacher:'',address:'',facebook:'',youtube:'',whatsapp:'',email:'',mobile:'',pledge:PLEDGE,approval:APPROVAL},students:[],collections:[],feeRules:[],staff:[],salaries:[],expenses:[],notices:[],certificates:[],seq:{form:0,receipt:0,staff:0,voucher:0,salary:0}});
 let DB=defDB(),LOADED=false,PW='';
 try{PW=localStorage.getItem('madrasa_pw')||''}catch(e){}
-const NUMF=new Set(['formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created','ts']);
+const NUMF=new Set(['tno','formNo','salary','amount','totalDue','totalPaid','remaining','receiptNo','no','base','extra','ded','net','paid','created','ts']);
 const BOOLF=new Set(['pledge','approved']);
 const JSONF=new Set(['lines','history','seq','items']);
 function norm(rec){for(const k in rec){const x=rec[k];
@@ -423,8 +423,10 @@ function applyList(d){
     const st=norm(d.settings||{});const sq=st.seq||{};delete st.seq;delete st.id;
     DB.settings=Object.assign(defDB().settings,st);
     if(!DB.settings.pledge)DB.settings.pledge=PLEDGE;if(!DB.settings.approval)DB.settings.approval=APPROVAL;
+    DB.students.forEach(s=>{if(s.formNo)s.sid=mkSid(s.admDate,s.formNo)});
+    DB.staff.forEach(t=>{if(!t.tno&&/^স/.test(String(t.tid)))t.tno=+String(t.tid).replace(/\D/g,'')||0;if(fyear()&&t.tno)t.tid=mkTid(t.tno)});
     const mx=(a,f)=>a.reduce((t,x)=>Math.max(t,+x[f]||0),0);
-    DB.seq={form:Math.max(+sq.form||0,mx(DB.students,'formNo')),receipt:Math.max(+sq.receipt||0,mx(DB.collections,'receiptNo')),staff:Math.max(+sq.staff||0,DB.staff.reduce((t,x)=>Math.max(t,+String(x.tid).replace(/\D/g,'')||0),0)),voucher:Math.max(+sq.voucher||0,mx(DB.expenses,'no')),salary:Math.max(+sq.salary||0,mx(DB.salaries,'no'))};
+    DB.seq={form:Math.max(+sq.form||0,mx(DB.students,'formNo')),receipt:Math.max(+sq.receipt||0,mx(DB.collections,'receiptNo')),staff:Math.max(+sq.staff||0,mx(DB.staff,'tno')),voucher:Math.max(+sq.voucher||0,mx(DB.expenses,'no')),salary:Math.max(+sq.salary||0,mx(DB.salaries,'no'))};
   LOADED=true;
   try{localStorage.setItem('madrasa_name',DB.settings.name||'');localStorage.setItem('madrasa_logo',DB.settings.logo||'')}catch(e){}
 }
@@ -618,8 +620,8 @@ function repData(from,to){
 /* ================= menu + router ================= */
 const MENU=[
  {k:'dash',t:'ড্যাশবোর্ড'},
- {t:'শিক্ষার্থী',sub:[['stu','ভর্তি ফরম'],['fee','মাসিক ফি আদায়'],['idc','আইডি কার্ড']]},
- {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম'],['sidc','আইডি কার্ড']]},
+ {t:'শিক্ষার্থী',sub:[['stu','ভর্তি ফরম'],['fee','মাসিক ফি আদায়'],['fdue','বকেয়া লিস্ট'],['idc','আইডি কার্ড']]},
+ {t:'শিক্ষক ও কর্মচারী',sub:[['stf','জয়েন ফরম'],['sal','বেতন ফরম'],['sdue','বকেয়া লিস্ট'],['sidc','আইডি কার্ড']]},
  {k:'exp',t:'খরচ'},
  {t:'সার্টিফিকেট',sub:[['tp','প্রত্যয়নপত্র'],['ct','সার্টিফিকেট']]},
  {t:'রিপোর্ট',sub:[['rm','মাসিক'],['ry','বাৎসরিক'],['rt','সর্বমোট']]},
@@ -652,7 +654,7 @@ function render(){
   AFTER=null;const s=DB.settings;
   paintHeader();
   const f=R.view==='form';
-  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,sidc:pStaffIdc,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
+  const map={dash:pDash,stu:f?stuForm:stuList,fee:f?feeForm:feeList,idc:pIdc,stf:f?stfForm:stfList,sal:f?salForm:salList,fdue:feeDue,sdue:staffDue,sidc:pStaffIdc,rules:pRules,exp:pExp,tp:pCertLetter,ct:pCertificate,rm:()=>pRep('m'),ry:()=>pRep('y'),rt:()=>pRep('t'),setup:pSetup,ntc:f?ntcForm:ntcList};
   $('#main').innerHTML=map[R.page]();
   if(AFTER)AFTER();drawMenu();$('#foot').innerHTML=siteFooter();
 }
@@ -690,17 +692,19 @@ function fillStu(){
   const q=en(v('q').toLowerCase()),fd=v('fd'),ft=v('ft');
   const rows=DB.students.filter(s=>(!fd||s.dept===fd)&&(!ft||s.type===ft)&&(!q||[s.name,s.sid,s.fMobile,s.mMobile,s.gMobile].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.formNo-a.formNo);
   $('#cnt').textContent='মোট '+bn(rows.length)+' জন';
-  $('#tb').innerHTML=rows.map(s=>`<tr><td>${bn(s.sid)}</td><td>${s.photo?`<img class="th" src="${s.photo}" alt="">`:''}</td><td>${esc(s.name)}</td><td>${s.dept}</td><td>${s.type}</td><td>${en(s.gMobile||s.fMobile||'')}</td>
+  $('#tb').innerHTML=rows.map(s=>`<tr><td>${s.sid}</td><td>${s.photo?`<img class="th" src="${s.photo}" alt="">`:''}</td><td>${esc(s.name)}</td><td>${s.dept}</td><td>${s.type}</td><td>${en(s.gMobile||s.fMobile||'')}</td>
   <td><div class="acts"><button class="btn sm ghost" onclick="go('stu','form','${s.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printStu('${s.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delStu('${s.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">কোনো শিক্ষার্থী নেই। “নতুন ভর্তি” চাপুন।</td></tr>`;
 }
-const mkSid=(date,fn)=>String(date||today()).slice(2,4)+pad(fn,3);
+const fyear=()=>en(DB.settings.founded||'').replace(/\D/g,'');
+const mkSid=(date,fn)=>'STU'+(fyear()||String(date||today()).slice(0,4))+pad(fn,3);
+const mkTid=n=>'IN'+(fyear()||String(new Date().getFullYear()))+pad(n,3);
 function stuForm(){
   const s=DB.students.find(x=>x.id===R.id)||{},nw=!s.id,fn=nw?DB.seq.form+1:s.formNo,st=DB.settings;
   return `<div class="bar"><h1>${nw?'নতুন ভর্তি ফরম':'ভর্তি ফরম সম্পাদনা'}</h1><button class="btn ghost" onclick="go('stu')">← তালিকা</button></div>
   <div class="panel">
   <div class="sec">ভর্তির তথ্য</div><div class="grid">
    ${fld('f_fn','ফরম নং (অটো)',bn(fn),'text','readonly')}
-   ${fld('f_sid','আইডি (অটো)',bn(nw?mkSid(today(),fn):s.sid),'text','readonly')}
+   ${fld('f_sid','আইডি (অটো)',(nw?mkSid(today(),fn):s.sid),'text','readonly')}
    ${fld('f_adm','ভর্তির তারিখ',s.admDate||today(),'date','onchange="prevSid()"')}
    ${sel('f_dept','বিভাগ',DEPTS,s.dept)}
    ${sel('f_type','ধরণ',TYPES,s.type)}
@@ -737,7 +741,7 @@ function stuForm(){
   <div class="row"><button class="btn" onclick="saveStu()">সংরক্ষণ করুন</button><button class="btn ghost" onclick="go('stu')">বাতিল</button>${nw?'':`<button class="btn ghost" onclick="printStu('${s.id}')">প্রিন্ট</button>`}</div>
   </div>`;
 }
-function prevSid(){const e=DB.students.find(x=>x.id===R.id);if(!e)$('#f_sid').value=bn(mkSid(v('f_adm'),DB.seq.form+1))}
+function prevSid(){const e=DB.students.find(x=>x.id===R.id);if(!e)$('#f_sid').value=mkSid(v('f_adm'),DB.seq.form+1)}
 function upAge(){$('#f_age').value=age(v('f_dob'))}
 function copyFather(){$('#f_gName').value=v('f_fName');$('#f_gRel').value='পিতা';$('#f_gMobile').value=v('f_fMobile')}
 async function saveStu(){
@@ -765,7 +769,7 @@ function admissionDoc(s){
   const st=DB.settings;
   const atts=[['জন্ম নিবন্ধন',s.birthCert],['পিতার এনআইডি',s.fNid],['মাতার এনআইডি',s.mNid]].filter(a=>a[1]&&a[1]!=='@');
   return `<div class="doc">${lh()}<div class="dt">ভর্তি ফরম</div>
-  <div class="dmeta"><div>ফরম নং: <b>${bn(s.formNo)}</b></div><div>আইডি: <b>${bn(s.sid)}</b></div><div>ভর্তির তারিখ: <b>${fdate(s.admDate)}</b></div></div>
+  <div class="dmeta"><div>ফরম নং: <b>${bn(s.formNo)}</b></div><div>আইডি: <b>${s.sid}</b></div><div>ভর্তির তারিখ: <b>${fdate(s.admDate)}</b></div></div>
   <div class="dtop"><div><table class="kv">${kvRows([['বিভাগ',s.dept],['ধরণ',s.type],['নাম',esc(s.name)],['জন্ম তারিখ',fdate(s.dob)],['বয়স',age(s.dob)],['রক্তের গ্রুপ',esc(s.blood)]])}</table></div><div class="dphoto">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div></div>
   <table class="kv"><tr><th></th><th>নাম</th><th>পেশা / সম্পর্ক</th><th>মোবাইল</th></tr><tr><th>পিতা</th><td>${esc(s.fName)}</td><td>${esc(s.fJob)}</td><td>${en(s.fMobile)}</td></tr><tr><th>মাতা</th><td>${esc(s.mName)}</td><td>${esc(s.mJob)}</td><td>${en(s.mMobile)}</td></tr><tr><th>অভিভাবক</th><td>${esc(s.gName)}</td><td>${esc(s.gRel)}</td><td>${en(s.gMobile)}</td></tr></table>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(s.permAddr)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(s.presAddr)}</td></tr></table>
@@ -780,7 +784,7 @@ function admissionDoc(s){
 let PRE=null;
 function feeList(){
   AFTER=fillFee;
-  return `<div class="bar"><h1>মাসিক ফি আদায়</h1><button class="btn" onclick="go('fee','form')">+ ফি আদায়</button></div>
+  return `<div class="bar"><h1>মাসিক ফি আদায়</h1><div class="acts"><button class="btn ghost" onclick="go('fdue')">বকেয়া লিস্ট</button><button class="btn" onclick="go('fee','form')">+ ফি আদায়</button></div></div>
   <div class="panel"><div class="filters"><input id="q" placeholder="নাম বা আইডি দিয়ে খুঁজুন" oninput="fillFee()"><input id="fm" type="month" onchange="fillFee()" aria-label="মাস"><select id="fs" onchange="fillFee()"><option value="">সকল বিভাগ</option>${DEPTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
   <p class="cnt" id="cnt"></p><div class="tw"><table class="tbl"><thead><tr><th>রশিদ</th><th>তারিখ</th><th>নাম</th><th>আইডি</th><th>মাস</th><th class="n">পরিশোধ</th><th class="n">অবশিষ্ট</th><th></th></tr></thead><tbody id="tb"></tbody><tfoot id="tf"></tfoot></table></div></div>`;
 }
@@ -788,11 +792,11 @@ function fillFee(){
   const q=en(v('q').toLowerCase()),fm=v('fm'),fs=v('fs');
   const rows=DB.collections.map(c=>({c,s:DB.students.find(x=>x.id===c.studentId)||{name:'(মুছে ফেলা)',sid:''}})).filter(r=>(!fm||r.c.month===fm)&&(!fs||r.s.dept===fs)&&(!q||(r.s.name+' '+r.s.sid).toLowerCase().includes(q))).sort((a,b)=>b.c.receiptNo-a.c.receiptNo);
   $('#cnt').textContent='মোট '+bn(rows.length)+' টি রশিদ';
-  $('#tb').innerHTML=rows.map(({c,s})=>`<tr><td>${bn(c.receiptNo)}</td><td>${fdate(c.date)}</td><td>${esc(s.name)}</td><td>${bn(s.sid)}</td><td>${fmonth(c.month)}</td><td class="n">${tk(c.totalPaid)}</td><td class="n">${tk(c.remaining)}</td>
+  $('#tb').innerHTML=rows.map(({c,s})=>`<tr><td>${bn(c.receiptNo)}</td><td>${fdate(c.date)}</td><td>${esc(s.name)}</td><td>${s.sid}</td><td>${fmonth(c.month)}</td><td class="n">${tk(c.totalPaid)}</td><td class="n">${tk(c.remaining)}</td>
   <td><div class="acts"><button class="btn sm ghost" onclick="go('fee','form','${c.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printRc('${c.id}')">প্রিন্ট</button><button class="btn sm ghost" onclick="shareRc('${c.id}')">শেয়ার</button><button class="btn sm danger" onclick="delFee('${c.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="8" class="empty">কোনো রশিদ নেই</td></tr>`;
   $('#tf').innerHTML=rows.length?`<tr><td colspan="5">মোট</td><td class="n">${tk(rows.reduce((t,r)=>t+r.c.totalPaid,0))}</td><td colspan="2"></td></tr>`:'';
 }
-function stOpts(cur,q){q=q||'';return '<option value="">— নির্বাচন করুন —</option>'+DB.students.filter(s=>!q||(s.name+' '+s.sid).toLowerCase().includes(q)||s.id===cur).sort((a,b)=>a.name.localeCompare(b.name,'bn')).map(s=>`<option value="${s.id}" ${s.id===cur?'selected':''}>${esc(s.name)} (${bn(s.sid)})</option>`).join('')}
+function stOpts(cur,q){q=q||'';return '<option value="">— নির্বাচন করুন —</option>'+DB.students.filter(s=>!q||(s.name+' '+s.sid).toLowerCase().includes(q)||s.id===cur).sort((a,b)=>a.name.localeCompare(b.name,'bn')).map(s=>`<option value="${s.id}" ${s.id===cur?'selected':''}>${esc(s.name)} (${s.sid})</option>`).join('')}
 function filterSt(){const cur=v('c_st');$('#c_st').innerHTML=stOpts(cur,en(v('c_q').toLowerCase()))}
 function feeForm(){
   const c=DB.collections.find(x=>x.id===R.id)||{},nw=!c.id;
@@ -814,7 +818,7 @@ function feeForm(){
 }
 function calcLines(){
   const sid=v('c_st'),m=v('c_m'),box=$('#lines'),s=DB.students.find(x=>x.id===sid);
-  $('#c_id').value=s?bn(s.sid):'';
+  $('#c_id').value=s?s.sid:'';
   if(!s||!m){box.innerHTML='<p class="empty">শিক্ষার্থী ও মাস নির্বাচন করলে ভর্তি থেকে ওই মাস পর্যন্ত বকেয়া দেখা যাবে।</p>';return}
   const start=s.admDate.slice(0,7);
   if(start>m){box.innerHTML=`<p class="empty">নির্বাচিত মাস ভর্তির মাসের (${fmonth(start)}) আগে।</p>`;return}
@@ -847,7 +851,7 @@ async function delFee(id){if(!await ask('এই রশিদটি মুছে 
 function receiptDoc(c,badge){
   const s=DB.students.find(x=>x.id===c.studentId)||{name:'',sid:'',dept:'',type:''};
   return `<div class="doc rc">${lh(badge)}<div class="dthead"><div class="dtl">রশিদ নং: <b>${bn(c.receiptNo)}</b></div><div class="dt">ফি আদায় রশিদ</div><div class="dtr">তারিখ: <b>${fdate(c.date)}</b></div></div>
-  <table class="kv">${kvRows([['নাম',esc(s.name)],['আইডি',bn(s.sid)],['বিভাগ',s.dept],['ধরণ',s.type],['ভর্তি',fmonth((s.admDate||'').slice(0,7))],['হিসাব পর্যন্ত',fmonth(c.month)]])}</table>
+  <table class="kv">${kvRows([['নাম',esc(s.name)],['আইডি',s.sid],['বিভাগ',s.dept],['ধরণ',s.type],['ভর্তি',fmonth((s.admDate||'').slice(0,7))],['হিসাব পর্যন্ত',fmonth(c.month)]])}</table>
   <table class="kv"><tr><th>খাত</th><th class="n">মোট প্রাপ্য</th><th class="n">পূর্বে পরিশোধ</th><th class="n">বকেয়া</th><th class="n">পরিশোধ</th><th class="n">অবশিষ্ট</th></tr>${c.lines.map(l=>`<tr><td>${esc(l.head)}</td><td class="n">${l.total!=null?tk(l.total):''}</td><td class="n">${l.prev!=null?tk(l.prev):''}</td><td class="n">${tk(l.due)}</td><td class="n">${tk(l.paid)}</td><td class="n">${tk(l.due-l.paid)}</td></tr>`).join('')}<tr><th>মোট</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.total||0),0))}</th><th class="n">${tk(c.lines.reduce((t,l)=>t+(l.prev||0),0))}</th><th class="n">${tk(c.totalDue)}</th><th class="n">${tk(c.totalPaid)}</th><th class="n">${tk(c.remaining)}</th></tr></table>
   ${c.note?`<div>মন্তব্য: ${esc(c.note)}</div>`:''}
   <div class="sigrow">${sg(c.sigCash,'ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
@@ -909,7 +913,7 @@ function idCard(s){
   const addr=same?(s.permAddr||s.presAddr?row('ঠিকানা',esc(s.permAddr||s.presAddr)):''):row('স্থায়ী',esc(s.permAddr))+row('বর্তমান',esc(s.presAddr));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${s.photo?`<img src="${s.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(s.name)}</div>
-  <table class="kvc">${row('আইডি',bn(s.sid))}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',en(s.gMobile||s.fMobile||''))}</table></div>
+  <table class="kvc">${row('আইডি',s.sid)}${row('বিভাগ',`${s.dept} (${s.type})`)}${s.blood?row('রক্তের গ্রুপ',esc(s.blood)):''}${row('অভিভাবক',en(s.gMobile||s.fMobile||''))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
   <div class="if">${st.directorMobile?'যোগাযোগ: '+en(instMob(st)||st.directorMobile):'&nbsp;'}</div></div>
   <div class="idc">${wm}${head}<div class="bd"><div class="bh">শিক্ষার্থীর ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে হিসাব দেখুন</div></div>`:''}</div>
@@ -921,7 +925,7 @@ function pStaffIdc(){
   AFTER=stfIdcFill;
   return `<div class="bar"><h1>আইডি কার্ড</h1><button class="btn" onclick="stfIdcPrint()">প্রিন্ট</button></div>
   <div class="panel"><div class="seg"><label><input type="radio" name="sidm" value="one" checked onchange="stfIdcFill()"> নির্দিষ্ট কর্মী</label><label><input type="radio" name="sidm" value="all" onchange="stfIdcFill()"> সকল কর্মী</label></div>
-  <div class="grid"><label class="fld" id="sidone"><span>কর্মী</span><select id="sidst" onchange="stfIdcFill()"><option value="">— নির্বাচন করুন —</option>${DB.staff.map(t=>`<option value="${t.id}">${esc(t.name)} (${bn(t.tid)})</option>`).join('')}</select></label></div></div>
+  <div class="grid"><label class="fld" id="sidone"><span>কর্মী</span><select id="sidst" onchange="stfIdcFill()"><option value="">— নির্বাচন করুন —</option>${DB.staff.map(t=>`<option value="${t.id}">${esc(t.name)} (${t.tid})</option>`).join('')}</select></label></div></div>
   <div class="cards" id="sidprev"></div>`;
 }
 function stfIdList(){const all=document.querySelector('input[name=sidm]:checked').value==='all';if(all)return DB.staff;const t=DB.staff.find(x=>x.id===v('sidst'));return t?[t]:[]}
@@ -936,7 +940,7 @@ function staffIdCard(t){
   const addr=same?(t.perm||t.pres?row('ঠিকানা',esc(t.perm||t.pres)):''):row('স্থায়ী',esc(t.perm))+row('বর্তমান',esc(t.pres));
   return `<div class="pair"><div class="idc">${wm}${head}
   <div class="ib"><div class="ph">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div><div class="nm">${esc(t.name)}</div>
-  <table class="kvc">${row('আইডি',bn(t.tid))}${row('পদবি',esc(t.desig))}${row('মোবাইল',en(t.mobile))}</table></div>
+  <table class="kvc">${row('ইনডেক্স নং',t.tid)}${row('পদবি',esc(t.desig))}${row('মোবাইল',en(t.mobile))}</table></div>
   <div class="sb">${st.directorSig?`<img src="${st.directorSig}" alt="">`:'<div style="height:7mm"></div>'}<span>পরিচালক</span></div>
   <div class="if">${st.directorMobile?'যোগাযোগ: '+en(instMob(st)||st.directorMobile):'&nbsp;'}</div></div>
   <div class="idc">${wm}${head}<div class="bd"><div class="bh">ঠিকানা</div><table class="kvc">${addr}</table>${qr?`<div class="qr"><img src="${qr}" alt="QR"><div class="qrl">স্ক্যান করে বেতনের হিসাব দেখুন</div></div>`:''}</div>
@@ -947,20 +951,20 @@ function staffIdCard(t){
 function stfList(){
   AFTER=fillStf;
   return `<div class="bar"><h1>জয়েন ফরম</h1><button class="btn" onclick="go('stf','form')">+ নতুন জয়েন</button></div>
-  <div class="panel"><div class="filters" style="grid-template-columns:1fr"><input id="q" placeholder="নাম, আইডি বা মোবাইল দিয়ে খুঁজুন" oninput="fillStf()"></div><p class="cnt" id="cnt"></p>
-  <div class="tw"><table class="tbl"><thead><tr><th>আইডি</th><th>ছবি</th><th>নাম</th><th>পদ</th><th>মোবাইল</th><th class="n">বেতন</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
+  <div class="panel"><div class="filters" style="grid-template-columns:1fr"><input id="q" placeholder="নাম, ইনডেক্স নং বা মোবাইল দিয়ে খুঁজুন" oninput="fillStf()"></div><p class="cnt" id="cnt"></p>
+  <div class="tw"><table class="tbl"><thead><tr><th>ইনডেক্স নং</th><th>ছবি</th><th>নাম</th><th>পদ</th><th>মোবাইল</th><th class="n">বেতন</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></div>`;
 }
 function fillStf(){
   const q=en(v('q').toLowerCase());const rows=DB.staff.filter(t=>!q||[t.name,t.tid,t.mobile].join(' ').toLowerCase().includes(q));
   $('#cnt').textContent='মোট '+bn(rows.length)+' জন';
-  $('#tb').innerHTML=rows.map(t=>`<tr><td>${bn(t.tid)}</td><td>${t.photo?`<img class="th" src="${t.photo}" alt="">`:''}</td><td>${esc(t.name)}</td><td>${esc(t.desig)}</td><td>${en(t.mobile)}</td><td class="n">${tk(t.salary)}</td>
+  $('#tb').innerHTML=rows.map(t=>`<tr><td>${t.tid}</td><td>${t.photo?`<img class="th" src="${t.photo}" alt="">`:''}</td><td>${esc(t.name)}</td><td>${esc(t.desig)}</td><td>${en(t.mobile)}</td><td class="n">${tk(t.salary)}</td>
   <td><div class="acts"><button class="btn sm ghost" onclick="go('stf','form','${t.id}')">সম্পাদনা</button><button class="btn sm ghost" onclick="printStf('${t.id}')">প্রিন্ট</button><button class="btn sm danger" onclick="delStf('${t.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">কেউ নেই। “নতুন জয়েন” চাপুন।</td></tr>`;
 }
 function stfForm(){
   const t=DB.staff.find(x=>x.id===R.id)||{},nw=!t.id;
   return `<div class="bar"><h1>${nw?'জয়েন ফরম':'জয়েন ফরম সম্পাদনা'}</h1><button class="btn ghost" onclick="go('stf')">← তালিকা</button></div>
   <div class="panel"><div class="grid">
-   ${fld('t_id','আইডি (অটো)',bn(nw?'স-'+pad(DB.seq.staff+1,3):t.tid),'text','readonly')}
+   ${fld('t_id','ইনডেক্স নং (অটো)',(nw?mkTid(DB.seq.staff+1):t.tid),'text','readonly')}
    ${fld('t_date','জয়েনের তারিখ',t.joinDate||today(),'date')}
    ${fld('t_name','নাম',t.name)}${fld('t_father','পিতার নাম',t.father)}
    ${fld('t_dob','জন্ম তারিখ',t.dob,'date')}
@@ -974,7 +978,7 @@ function stfForm(){
 async function saveStf(){
   if(!v('t_name'))return toast('নাম লিখুন');if(!v('t_desig'))return toast('পদবি লিখুন');
   const ex=DB.staff.find(x=>x.id===R.id),n=ex?0:DB.seq.staff+1;
-  const o={id:ex?ex.id:uid(),tid:ex?ex.tid:'স-'+pad(n,3),joinDate:v('t_date'),name:v('t_name'),father:v('t_father'),dob:v('t_dob'),desig:v('t_desig'),edu:v('t_edu'),nid:en(v('t_nid')),mobile:en(v('t_mobile')),salary:num('t_salary'),perm:v('t_perm'),pres:v('t_pres'),photo:FV.t_photo,sig:getSig('t_sig')};
+  const o={id:ex?ex.id:uid(),tid:ex?ex.tid:mkTid(n),tno:ex?ex.tno:n,joinDate:v('t_date'),name:v('t_name'),father:v('t_father'),dob:v('t_dob'),desig:v('t_desig'),edu:v('t_edu'),nid:en(v('t_nid')),mobile:en(v('t_mobile')),salary:num('t_salary'),perm:v('t_perm'),pres:v('t_pres'),photo:FV.t_photo,sig:getSig('t_sig')};
   const ops=[{op:'upsert',table:'staff',rec:wireK(o,ex,['sig'])}];if(!ex)ops.push(seqOp({staff:n}));
   if(!await work(()=>batch(ops)))return;
   o._full=true;if(ex)DB.staff[DB.staff.indexOf(ex)]=o;else{DB.staff.push(o);DB.seq.staff=n}
@@ -986,16 +990,81 @@ async function delStf(id){const t=DB.staff.find(x=>x.id===id);if(!await ask(`“
   DB.staff=DB.staff.filter(x=>x.id!==id);DB.salaries=DB.salaries.filter(x=>x.staffId!==id);render();toast('মুছে ফেলা হয়েছে')}
 async function printStf(id){
   let t;try{t=await hydrate('staff',DB.staff.find(x=>x.id===id))}catch(e){return handleErr(e)}
-  printHTML(`<div class="doc">${lh()}<div class="dt">শিক্ষক ও কর্মচারী জয়েন ফরম</div><div class="dmeta"><div>আইডি: <b>${bn(t.tid)}</b></div><div>জয়েনের তারিখ: <b>${fdate(t.joinDate)}</b></div></div>
+  printHTML(`<div class="doc">${lh()}<div class="dt">শিক্ষক ও কর্মচারী জয়েন ফরম</div><div class="dmeta"><div>ইনডেক্স নং: <b>${t.tid}</b></div><div>জয়েনের তারিখ: <b>${fdate(t.joinDate)}</b></div></div>
   <div class="dtop"><div><table class="kv">${kvRows([['নাম',esc(t.name)],['পিতার নাম',esc(t.father)],['জন্ম তারিখ',fdate(t.dob)],['পদবি',esc(t.desig)],['যোগ্যতা',esc(t.edu)],['এনআইডি',bn(t.nid)],['মোবাইল',en(t.mobile)],['মাসিক বেতন',tk(t.salary)]])}</table></div><div class="dphoto">${t.photo?`<img src="${t.photo}" alt="">`:'ছবি'}</div></div>
   <table class="kv"><tr><th>স্থায়ী ঠিকানা</th><td>${esc(t.perm)}</td></tr><tr><th>বর্তমান ঠিকানা</th><td>${esc(t.pres)}</td></tr></table>
   <div class="sigrow">${sg(t.sig,'কর্মীর স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`);
 }
 
+
+/* ================= বকেয়া লিস্ট ================= */
+function dueTable(D,idLabel,cls){
+  const kv=cls==='kv',ths=kv?' style="width:auto"':'';
+  const cell=(r,h)=>r.by[h]?tk(r.by[h])+(r.sub&&r.sub[h]?`<br><small>(${r.sub[h]})</small>`:''):'—';
+  const head=`<tr><th${ths}>${idLabel}</th><th${ths}>নাম</th>${D.heads.map(h=>`<th class="n"${ths}>${esc(h)}</th>`).join('')}<th class="n"${ths}>মোট</th></tr>`;
+  const body=D.rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.name)}</td>${D.heads.map(h=>`<td class="n">${cell(r,h)}</td>`).join('')}<td class="n"><b>${tk(r.tot)}</b></td></tr>`).join('')||`<tr><td colspan="${D.heads.length+3}" style="text-align:center">কোনো বকেয়া নেই</td></tr>`;
+  const foot=D.rows.length?`<tr><td colspan="2"><b>সর্বমোট</b></td>${D.heads.map(h=>`<td class="n"><b>${tk(D.rows.reduce((t,r)=>t+(r.by[h]||0),0))}</b></td>`).join('')}<td class="n"><b>${tk(D.total)}</b></td></tr>`:'';
+  return kv?`<table class="kv" style="width:100%"><thead>${head}</thead><tbody>${body}${foot}</tbody></table>`
+           :`<table class="tbl"><thead>${head}</thead><tbody>${body}</tbody><tfoot>${foot}</tfoot></table>`;
+}
+const DUE={m:''};
+function dueBar(title,pr){return `<div class="bar"><h1>${title}</h1><div class="acts"><button class="btn" onclick="${pr}()">প্রিন্ট</button></div></div>`}
+function feeDue(){
+  DUE.m=DUE.m||ym();AFTER=fillFeeDue;
+  return dueBar('বকেয়া লিস্ট — শিক্ষার্থী','printFeeDue')+`<div class="panel"><div class="filters"><input id="dq" placeholder="নাম বা আইডি দিয়ে খুঁজুন" oninput="fillFeeDue()"><input id="dm" type="month" value="${DUE.m}" onchange="fillFeeDue()" aria-label="মাস"><select id="dd" onchange="fillFeeDue()"><option value="">সকল বিভাগ</option>${DEPTS.map(d=>`<option>${d}</option>`).join('')}</select></div><p class="cnt" id="cnt"></p><div class="tw" id="dueBox"></div></div>`;
+}
+function feeDueData(){
+  const asOf=v('dm')||DUE.m||ym(),fd=v('dd'),q=en((v('dq')||'').toLowerCase());DUE.m=asOf;
+  const rows=[],hs=new Set();
+  DB.students.forEach(s=>{
+    if(!s.admDate||s.admDate.slice(0,7)>asOf||(fd&&s.dept!==fd)||(q&&!(s.name+' '+s.sid).toLowerCase().includes(q)))return;
+    const by={};let tot=0;
+    Object.entries(studentDues(s,asOf)).forEach(([h,x])=>{const r=Math.round((x.acc-x.paid)*100)/100;if(r>0.001){by[h]=r;tot+=r;hs.add(h)}});
+    if(tot>0.001)rows.push({id:s.sid,name:s.name,by,tot,k:s.formNo||0});
+  });
+  const order=[];DB.feeRules.forEach(r=>{if(!order.includes(r.head))order.push(r.head)});
+  const heads=[...hs].sort((a,b)=>{const x=order.indexOf(a),y=order.indexOf(b);return(x<0?999:x)-(y<0?999:y)});
+  rows.sort((a,b)=>a.k-b.k);
+  return{asOf,heads,rows,total:rows.reduce((t,r)=>t+r.tot,0)};
+}
+function fillFeeDue(){const D=feeDueData();$('#cnt').textContent='মোট '+bn(D.rows.length)+' জনের বকেয়া আছে — '+tk(D.total);$('#dueBox').innerHTML=dueTable(D,'আইডি নং','tbl')}
+function dueDoc(title,D,idLabel){
+  return `<div class="doc">${lh()}<div class="dt">${title}</div><div class="dmeta"><div>${fmonth(D.asOf)} পর্যন্ত</div><div>মোট বকেয়া: <b>${tk(D.total)}</b></div></div>${dueTable(D,idLabel,'kv')}<div class="sigrow">${sg('','ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
+}
+function printFeeDue(){const D=feeDueData();printHTML(dueDoc('শিক্ষার্থীদের বকেয়া তালিকা',D,'আইডি নং'),{landscape:D.heads.length>3})}
+
+const H_UN='মাসিক বেতন (অপরিশোধিত মাস)',H_PT='আংশিক বকেয়া';
+function staffDue(){
+  DUE.m=DUE.m||ym();AFTER=fillStaffDue;
+  return dueBar('বকেয়া লিস্ট — শিক্ষক ও কর্মচারী','printStaffDue')+`<div class="panel"><div class="filters" style="grid-template-columns:2fr 1fr"><input id="dq" placeholder="নাম বা ইনডেক্স নং দিয়ে খুঁজুন" oninput="fillStaffDue()"><input id="dm" type="month" value="${DUE.m}" onchange="fillStaffDue()" aria-label="মাস"></div><p class="cnt" id="cnt"></p><div class="tw" id="dueBox"></div></div>`;
+}
+function staffDueData(){
+  const asOf=v('dm')||DUE.m||ym(),q=(v('dq')||'').toLowerCase();DUE.m=asOf;
+  const rows=[],hs=new Set();
+  DB.staff.forEach(t=>{
+    if(q&&!(t.name+' '+t.tid).toLowerCase().includes(q))return;
+    const start=(t.joinDate||'').slice(0,7)||asOf;if(start>asOf)return;
+    let un=0,unM=0,pt=0;
+    monthsBetween(start,asOf).forEach(m=>{
+      const rs=DB.salaries.filter(x=>x.staffId===t.id&&x.month===m);
+      if(!rs.length){if((+t.salary||0)>0){un+=+t.salary;unM++}}
+      else{const r=rs.reduce((a,x)=>a+(+x.net||0)-(+x.paid||0),0);if(r>0.001)pt+=r}
+    });
+    const by={},sub={};
+    if(un>0.001){by[H_UN]=un;sub[H_UN]=bn(unM)+' মাস';hs.add(H_UN)}
+    if(pt>0.001){by[H_PT]=Math.round(pt*100)/100;hs.add(H_PT)}
+    const tot=un+pt;if(tot>0.001)rows.push({id:t.tid,name:t.name,by,sub,tot,k:t.tno||0});
+  });
+  rows.sort((a,b)=>a.k-b.k);
+  return{asOf,heads:[H_UN,H_PT].filter(h=>hs.has(h)),rows,total:rows.reduce((t,r)=>t+r.tot,0)};
+}
+function fillStaffDue(){const D=staffDueData();$('#cnt').textContent='মোট '+bn(D.rows.length)+' জনের বকেয়া আছে — '+tk(D.total);$('#dueBox').innerHTML=dueTable(D,'ইনডেক্স নং','tbl')}
+function printStaffDue(){const D=staffDueData();printHTML(dueDoc('শিক্ষক ও কর্মচারীদের বকেয়া বেতনের তালিকা',D,'ইনডেক্স নং'))}
+
 /* ================= staff: salary ================= */
 function salList(){
   AFTER=fillSal;
-  return `<div class="bar"><h1>বেতন ফরম</h1><button class="btn" onclick="go('sal','form')">+ বেতন প্রদান</button></div>
+  return `<div class="bar"><h1>বেতন ফরম</h1><div class="acts"><button class="btn ghost" onclick="go('sdue')">বকেয়া লিস্ট</button><button class="btn" onclick="go('sal','form')">+ বেতন প্রদান</button></div></div>
   <div class="panel"><div class="filters" style="grid-template-columns:2fr 1fr"><input id="q" placeholder="নাম দিয়ে খুঁজুন" oninput="fillSal()"><input id="fm" type="month" onchange="fillSal()" aria-label="মাস"></div><p class="cnt" id="cnt"></p>
   <div class="tw"><table class="tbl"><thead><tr><th>ভাউচার</th><th>তারিখ</th><th>নাম</th><th>মাস</th><th class="n">নিট বেতন</th><th class="n">প্রদত্ত</th><th></th></tr></thead><tbody id="tb"></tbody><tfoot id="tf"></tfoot></table></div></div>`;
 }
@@ -1046,7 +1115,7 @@ async function printSal(id){
   let x;try{x=await hydrate('salaries',DB.salaries.find(s=>s.id===id))}catch(e){return handleErr(e)}
   const t=DB.staff.find(s=>s.id===x.staffId)||{name:'',desig:'',tid:''};
   const body=badge=>`<div class="doc rc">${lh(badge)}<div class="dthead"><div class="dtl">ভাউচার নং: <b>${bn(x.no)}</b></div><div class="dt">বেতন ভাউচার</div><div class="dtr">তারিখ: <b>${fdate(x.date)}</b></div></div>
-  <table class="kv">${kvRows([['নাম',esc(t.name)],['আইডি',bn(t.tid)],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
+  <table class="kv">${kvRows([['নাম',esc(t.name)],['ইনডেক্স নং',t.tid],['পদবি',esc(t.desig)],['মাস',fmonth(x.month)]])}</table>
   <table class="kv"><tr><th>মূল বেতন</th><td class="n">${tk(x.base)}</td></tr><tr><th>ভাতা / বোনাস</th><td class="n">${tk(x.extra)}</td></tr><tr><th>কর্তন / অগ্রিম</th><td class="n">${tk(x.ded)}</td></tr><tr><th>নিট বেতন</th><td class="n"><b>${tk(x.net)}</b></td></tr><tr><th>প্রদত্ত</th><td class="n"><b>${tk(x.paid)}</b></td></tr></table>
   ${x.note?`<div>মন্তব্য: ${esc(x.note)}</div>`:''}<div class="sigrow">${sg(x.sigRec,'গ্রহীতার স্বাক্ষর')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
   printHTML(`<div class="dualwrap">${dualPane(body('অফিস কপি'))}${dualPane(body('কর্মীর কপি'))}</div>`,{dual:true,nowm:true});
@@ -1153,7 +1222,7 @@ function toggleCertForm(prefix){CERTOPEN[prefix]=!CERTOPEN[prefix];render()}
 function filterCertSel(qid,selid){const cur=v(selid);$('#'+selid).innerHTML=stOpts(cur,en($('#'+qid).value.toLowerCase()))}
 function fillCertFields(prefix,withDept){
   const s=DB.students.find(x=>x.id===v(prefix+'_st'));
-  $('#'+prefix+'_id').value=s?bn(s.sid):'';
+  $('#'+prefix+'_id').value=s?s.sid:'';
   $('#'+prefix+'_name').value=s?(s.name||''):'';
   $('#'+prefix+'_father').value=s?(s.fName||''):'';
   $('#'+prefix+'_mother').value=s?(s.mName||''):'';
@@ -1191,7 +1260,7 @@ function fillCertList(prefix){
   const q=en(($('#'+prefix+'_lq')?$('#'+prefix+'_lq').value:'').toLowerCase());
   const rows=DB.certificates.filter(c=>c.type===prefix&&(!q||(c.name+' '+c.sid).toLowerCase().includes(q))).sort((a,b)=>b.ts-a.ts);
   $('#'+prefix+'_cnt').textContent='মোট '+bn(rows.length)+' টি';
-  $('#'+prefix+'_tb').innerHTML=rows.map(c=>`<tr><td>${fdate(c.date)}</td><td>${esc(c.name)}</td><td>${bn(c.sid)}</td>${prefix==='ct'?`<td>${esc(c.dept||'')}</td>`:''}<td><div class="acts"><button class="btn sm ghost" onclick="reprintCert('${c.id}')">আবার প্রিন্ট</button><button class="btn sm danger" onclick="delCert('${c.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="${prefix==='ct'?5:4}" class="empty">কোনো রেকর্ড নেই</td></tr>`;
+  $('#'+prefix+'_tb').innerHTML=rows.map(c=>`<tr><td>${fdate(c.date)}</td><td>${esc(c.name)}</td><td>${c.sid}</td>${prefix==='ct'?`<td>${esc(c.dept||'')}</td>`:''}<td><div class="acts"><button class="btn sm ghost" onclick="reprintCert('${c.id}')">আবার প্রিন্ট</button><button class="btn sm danger" onclick="delCert('${c.id}')">মুছুন</button></div></td></tr>`).join('')||`<tr><td colspan="${prefix==='ct'?5:4}" class="empty">কোনো রেকর্ড নেই</td></tr>`;
 }
 function pCertLetter(){AFTER=()=>fillCertList('tp');return certPage('tp','প্রত্যয়নপত্র',false,'অতিরিক্ত বিবরণ (ঐচ্ছিক)')}
 function pCertificate(){AFTER=()=>fillCertList('ct');return certPage('ct','সার্টিফিকেট',true,'অর্জন / মন্তব্য (ঐচ্ছিক)')}
@@ -1217,7 +1286,7 @@ async function printCertLetter(){
   const s=DB.students.find(x=>x.id===v('tp_st'));if(!s)return toast('শিক্ষার্থী নির্বাচন করুন');
   if(!await ask('পরিচালক কি এই প্রত্যয়নপত্র ইস্যু করতে অনুমোদন দিয়েছেন?'))return;
   const date=v('tp_date')||today(),note=$('#tp_note').value.trim();
-  const name=$('#tp_name').value||s.name,father=$('#tp_father').value||s.fName||'',mother=$('#tp_mother').value||s.mName||'',addr=$('#tp_addr').value||s.permAddr||'',sid=$('#tp_id').value||bn(s.sid);
+  const name=$('#tp_name').value||s.name,father=$('#tp_father').value||s.fName||'',mother=$('#tp_mother').value||s.mName||'',addr=$('#tp_addr').value||s.permAddr||'',sid=$('#tp_id').value||s.sid;
   const rec={id:uid(),type:'tp',studentId:s.id,sid:s.sid,name,father,mother,addr,date,note,ts:Date.now()};
   if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
   DB.certificates.push(rec);
@@ -1229,7 +1298,7 @@ async function printCertificate(){
   const s=DB.students.find(x=>x.id===v('ct_st'));if(!s)return toast('শিক্ষার্থী নির্বাচন করুন');
   if(!await ask('পরিচালক কি এই সার্টিফিকেট ইস্যু করতে অনুমোদন দিয়েছেন?'))return;
   const date=v('ct_date')||today(),note=$('#ct_note').value.trim();
-  const name=$('#ct_name').value||s.name,father=$('#ct_father').value||s.fName||'',mother=$('#ct_mother').value||s.mName||'',addr=$('#ct_addr').value||s.permAddr||'',sid=$('#ct_id').value||bn(s.sid),dept=$('#ct_dept').value||s.dept||'';
+  const name=$('#ct_name').value||s.name,father=$('#ct_father').value||s.fName||'',mother=$('#ct_mother').value||s.mName||'',addr=$('#ct_addr').value||s.permAddr||'',sid=$('#ct_id').value||s.sid,dept=$('#ct_dept').value||s.dept||'';
   const rec={id:uid(),type:'ct',studentId:s.id,sid:s.sid,name,father,mother,addr,dept,date,note,ts:Date.now()};
   if(!await work(()=>batch([{op:'upsert',table:'certificates',rec}])))return;
   DB.certificates.push(rec);
@@ -1239,7 +1308,7 @@ async function printCertificate(){
 }
 async function reprintCert(id){
   const c=DB.certificates.find(x=>x.id===id);if(!c)return;
-  const body=c.type==='tp'?tpBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.note):ctBody(c.name,c.father,c.mother,c.addr,bn(c.sid),c.dept,c.note);
+  const body=c.type==='tp'?tpBody(c.name,c.father,c.mother,c.addr,c.sid,c.note):ctBody(c.name,c.father,c.mother,c.addr,c.sid,c.dept,c.note);
   try{busy(true);await ensureCertBg()}catch(e){}finally{busy(false)}
   printHTML(certDoc(c.type,c.type==='tp'?'প্রত্যয়নপত্র':'সার্টিফিকেট',body,c.date),{landscape:true,nowm:true,nocredit:true});
 }
@@ -1259,7 +1328,7 @@ function pRep(kind){
   <div class="dh3">খাত ভিত্তিক আয়</div><table class="kv">${Object.entries(D.byHead).map(([h,a])=>`<tr><td>${esc(h)}</td><td class="n">${tk(a)}</td></tr>`).join('')||'<tr><td>কোনো আদায় নেই</td><td></td></tr>'}</table>
   <div class="dh3">খাত ভিত্তিক ব্যয়</div><table class="kv">${Object.entries(D.byCat).map(([h,a])=>`<tr><td>${esc(h)}</td><td class="n">${tk(a)}</td></tr>`).join('')}<tr><td>শিক্ষক ও কর্মচারীর বেতন</td><td class="n">${tk(D.sal)}</td></tr></table>
   ${monthly?`<div class="dh3">মাস ভিত্তিক সারসংক্ষেপ</div><table class="kv"><tr><th>মাস</th><th class="n">আয়</th><th class="n">ব্যয়</th><th class="n">উদ্বৃত্ত</th></tr>${monthly}</table>`:''}
-  <div class="dh3">বকেয়া তালিকা (${fmonth(asOf)} পর্যন্ত) — মোট ${tk(out.total)}</div><table class="kv"><tr><th>আইডি</th><th>নাম</th><th>বিভাগ</th><th class="n">বকেয়া</th></tr>${out.rows.map(r=>`<tr><td>${bn(r.s.sid)}</td><td>${esc(r.s.name)}</td><td>${r.s.dept}</td><td class="n">${tk(r.due)}</td></tr>`).join('')||'<tr><td colspan="4">কোনো বকেয়া নেই</td></tr>'}</table>`;
+  <div class="dh3">বকেয়া তালিকা (${fmonth(asOf)} পর্যন্ত) — মোট ${tk(out.total)}</div><table class="kv"><tr><th>আইডি</th><th>নাম</th><th>বিভাগ</th><th class="n">বকেয়া</th></tr>${out.rows.map(r=>`<tr><td>${r.s.sid}</td><td>${esc(r.s.name)}</td><td>${r.s.dept}</td><td class="n">${tk(r.due)}</td></tr>`).join('')||'<tr><td colspan="4">কোনো বকেয়া নেই</td></tr>'}</table>`;
   window.__rep=`<div class="doc">${lh()}<div class="dt">${label}</div>${body}<div class="sigrow">${sg('','ক্যাশিয়ার')}${sg(DB.settings.directorSig,'পরিচালক')}</div></div>`;
   const inp='padding:8px;border:1px solid var(--field);border-radius:5px';
   const picker=kind==='m'?`<input type="month" value="${RP.m}" onchange="RP.m=this.value||ym();render()" style="${inp}">`:kind==='y'?`<input type="number" value="${RP.y}" min="2000" max="2100" onchange="RP.y=+en(this.value)||new Date().getFullYear();render()" style="width:100px;${inp}">`:'';
