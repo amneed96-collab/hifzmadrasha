@@ -82,8 +82,12 @@ function doPost(e) {
 
 /** সেটিংসে সংরক্ষিত পাসওয়ার্ড, না থাকলে ডিফল্ট। */
 function getPassword_() {
+  var c = CacheService.getScriptCache(), hit = c.get('pw');
+  if (hit !== null) return hit;
   var st = readTable('settings')[0] || {};
-  return st.loginPassword ? String(st.loginPassword) : DEFAULT_PASSWORD;
+  var pw = st.loginPassword ? String(st.loginPassword) : DEFAULT_PASSWORD;
+  try { c.put('pw', pw, 21600); } catch (e) {}
+  return pw;
 }
 
 /** আইডি কার্ড/সেটাপের মতোই — পরিচালকের মোবাইল ও এনআইডি মিলিয়ে পাসওয়ার্ড উদ্ধার। */
@@ -162,7 +166,7 @@ function listAll() {
   });
   var st = readTable('settings')[0] || {};
   var f = getFiles('settings', 'main');
-  Object.keys(f).forEach(function (k) { st[k] = f[k]; });
+  Object.keys(f).forEach(function (k) { st[k] = (k === 'certBg') ? '@' : f[k]; });  // বড় ব্যাকগ্রাউন্ড ছবি দরকার হলে আলাদা আনা হয়
   delete st.loginPassword;
   out.settings = st;
   return out;
@@ -171,10 +175,12 @@ function listAll() {
 /* ---------- write ---------- */
 function upsert(t, rec) {
   if (!rec || !rec.id) throw new Error('id নেই');
-  var s = sheet(t), h = headers(s);
-  Object.keys(rec).forEach(function (k) {
-    if (h.indexOf(k) < 0) { h.push(k); s.getRange(1, h.length).setValue(k); }
-  });
+  var s = sheet(t), h = headers(s), grew = false;
+  var newCols = Object.keys(rec).filter(function (k) { return h.indexOf(k) < 0; });
+  if (newCols.length) {
+    s.getRange(1, h.length + 1, 1, newCols.length).setValues([newCols]);
+    h = h.concat(newCols); grew = true;
+  }
   var last = s.getLastRow(), row = -1;
   if (last >= 2) {
     var ids = s.getRange(2, 1, last - 1, 1).getValues();
@@ -200,8 +206,9 @@ function upsert(t, rec) {
     cur[j] = (val === null || val === undefined) ? '' : String(val);
   }
   var rg = s.getRange(row, 1, 1, h.length);
-  rg.setNumberFormat('@');      // তারিখ/ফোন নম্বর যেন বদলে না যায়
+  if (isNew || grew) rg.setNumberFormat('@');      // তারিখ/ফোন নম্বর যেন বদলে না যায়
   rg.setValues([cur]);
+  if (t === 'settings' && 'loginPassword' in rec) CacheService.getScriptCache().remove('pw');
 }
 
 function del(t, id) {
